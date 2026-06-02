@@ -105,6 +105,17 @@ export const translations = {
       title: "Over 50 retter, tilberedt med kærlighed",
       label: "Billedbånd med retter",
     },
+    philosophy: {
+      kicker: "Vores filosofi",
+      label: "Filosofi",
+      statement:
+        "Hver ret er et møde — friske råvarer, ild og tradition fra tre køkkener, serveret med dansk gæstfrihed.",
+      body: "Inspireret af Hong Kongs travle gader laver vi mad, der summer af liv. Intet er masseproduceret; alt tilberedes friskt, når du bestiller.",
+      signature: "— ichi-go ichi-e · ét møde, én gang",
+    },
+    ribbon: {
+      words: ["KINA", "THAILAND", "VIETNAM", "AARHUS"],
+    },
     locations: {
       kicker: "Find os",
       title: "To restauranter i Aarhus centrum",
@@ -244,6 +255,17 @@ export const translations = {
       kicker: "Fresh produce every day",
       title: "Over 50 dishes, crafted with care",
       label: "Ribbon of dishes",
+    },
+    philosophy: {
+      kicker: "Our philosophy",
+      label: "Philosophy",
+      statement:
+        "Every dish is a meeting — fresh produce, fire and tradition from three kitchens, served with Danish hospitality.",
+      body: "Inspired by Hong Kong's bustling streets, we cook food that buzzes with life. Nothing is mass-produced; everything is made fresh when you order.",
+      signature: "— ichi-go ichi-e · one meeting, one time",
+    },
+    ribbon: {
+      words: ["CHINA", "THAILAND", "VIETNAM", "AARHUS"],
     },
     locations: {
       kicker: "Find us",
