@@ -145,6 +145,32 @@ export function DishTurntable({
           onDrag={(_, info) => rotation.set(rotation.get() + info.delta.x * 0.35)}
           onDragEnd={onDragEnd}
         >
+          {/* rotating table surface (laid flat) */}
+          <div
+            className="absolute left-1/2 top-1/2"
+            style={{
+              width: radius * 2.5,
+              height: radius * 2.5,
+              transform: "translate(-50%, -50%) rotateX(82deg)",
+              transformStyle: "preserve-3d",
+            }}
+            aria-hidden
+          >
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: `radial-gradient(circle at 50% 50%, ${accent}14, rgba(255,255,255,0.05) 55%, transparent 72%)`,
+                border: `1px solid ${accent}22`,
+                boxShadow: `0 0 60px ${accent}18`,
+              }}
+            />
+            {/* inner ring detail */}
+            <div
+              className="absolute inset-[18%] rounded-full"
+              style={{ border: "1px dashed rgba(247,241,230,0.10)" }}
+            />
+          </div>
+
           {dishes.map((dish, i) => (
             <Plate
               key={dish.id}
@@ -294,35 +320,37 @@ function Plate({
     >
       <motion.div
         style={{ rotateY: counter }}
-        className="relative h-full w-full"
+        className="relative flex h-full w-full items-center justify-center"
         animate={{
           scale: isActive ? 1.12 : 0.82,
-          opacity: isActive ? 1 : 0.55,
+          opacity: isActive ? 1 : 0.5,
         }}
         transition={{ type: "spring", stiffness: 120, damping: 18 }}
       >
-        {/* plate ring */}
+        {/* spotlight pool behind the dish */}
         <div
-          className="absolute inset-0 rounded-full"
+          className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity"
           style={{
             background: isActive
-              ? `radial-gradient(circle at 50% 38%, ${accent}33, transparent 70%)`
-              : "transparent",
+              ? `radial-gradient(circle at 50% 42%, ${accent}38, ${accent}10 45%, transparent 70%)`
+              : "radial-gradient(circle at 50% 42%, rgba(255,255,255,0.06), transparent 68%)",
           }}
         />
-        <div className="absolute inset-[14%] rounded-full bg-gradient-to-br from-white/10 to-white/[0.02] shadow-2xl backdrop-blur-sm" />
-        <div
-          className="absolute inset-[14%] rounded-full border"
-          style={{ borderColor: isActive ? `${accent}66` : "rgba(255,255,255,0.08)" }}
-        />
+
+        {/* elliptical contact shadow grounding the plate */}
+        <div className="absolute bottom-[12%] left-1/2 h-4 w-[58%] -translate-x-1/2 rounded-[100%] bg-black/55 blur-md" />
+
+        {/* the plated dish photo */}
         {dish.hasImage && (
-          <Image
-            src={`/images/dishes/${dish.id}.png`}
-            alt={dish.name}
-            fill
-            sizes="208px"
-            className="object-contain drop-shadow-[0_18px_30px_rgba(0,0,0,0.55)]"
-          />
+          <div className="relative h-[86%] w-[86%]">
+            <Image
+              src={`/images/dishes/${dish.id}.png`}
+              alt={dish.name}
+              fill
+              sizes="208px"
+              className="object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.5)]"
+            />
+          </div>
         )}
       </motion.div>
     </motion.button>
