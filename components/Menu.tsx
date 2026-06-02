@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   dishesAt,
@@ -75,6 +75,53 @@ export function Menu() {
   }, [filtered]);
 
   const showExtras = diet === "all" && !query;
+
+  // The list of jump-targets shown in the rail (food + drinks + wine).
+  const railSections = useMemo(() => {
+    const list: { id: string; label: string; kanji: string }[] = grouped.map(
+      (g) => ({
+        id: `sec-${g.cuisine}`,
+        label: CUISINE_LABELS[g.cuisine][lang],
+        kanji: sectionKanji[g.cuisine],
+      })
+    );
+    if (showExtras) {
+      list.push({ id: "sec-drinks", label: t.drinks.tabDrinks, kanji: "飲み物" });
+      if (currentLoc?.hasWine) {
+        list.push({ id: "sec-wine", label: t.drinks.tabWine, kanji: "ワイン" });
+      }
+    }
+    return list;
+  }, [grouped, showExtras, currentLoc, lang, t.drinks.tabDrinks, t.drinks.tabWine]);
+
+  const [activeSection, setActiveSection] = useState<string>("");
+
+  // scroll-spy: highlight the section currently in view
+  useEffect(() => {
+    const ids = railSections.map((s) => s.id);
+    if (ids.length === 0) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setActiveSection(visible[0].target.id);
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+    return () => obs.disconnect();
+  }, [railSections]);
+
+  const jumpTo = (id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 120;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  };
 
   // Flat, ordered list of everything visible — powers the swipeable modal.
   const modalItems = useMemo<ModalItem[]>(() => {
@@ -226,95 +273,147 @@ export function Menu() {
           </span>
         </div>
 
-        {/* Menu list */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={`${loc}-${diet}-${query}`}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.3 }}
-            className="mx-auto mt-12 max-w-3xl"
-          >
-            {grouped.map((group) => (
-              <Section
-                key={group.cuisine}
-                title={CUISINE_LABELS[group.cuisine][lang]}
-                kanji={sectionKanji[group.cuisine]}
-                count={group.items.length}
-              >
-                {group.items.map((dish) => (
-                  <Row
-                    key={dish.id}
-                    onClick={() => setModalIndex(indexOf(`dish-${dish.id}`))}
-                    img={dish.hasImage ? `/images/dishes/${dish.id}.png` : undefined}
-                    number={dish.id}
-                    name={dish.name}
-                    desc={dish.desc}
-                    price={dish.price}
-                    badges={
-                      <>
-                        {dish.isNew && (
-                          <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
-                            {t.menu.newLabel}
-                          </span>
-                        )}
-                        <DietBadge dish={dish} />
-                        {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
-                      </>
-                    }
-                  />
-                ))}
-              </Section>
-            ))}
-
-            {/* Drinks */}
-            {showExtras && (
-              <Section title={t.drinks.tabDrinks} kanji="飲み物" count={drinks.length}>
-                {drinks.map((d) => (
-                  <Row
-                    key={d.name}
-                    onClick={() => setModalIndex(indexOf(`drink-${d.name}`))}
-                    img={d.img ? `/images/drinks/${d.img}.png` : undefined}
-                    name={d.name}
-                    desc={
-                      d.options
-                        ? d.options.join(" · ")
-                        : d.lines?.map((l) => `${l.label} ${l.price},-`).join(" · ")
-                    }
-                    price={d.price}
-                  />
-                ))}
-              </Section>
-            )}
-
-            {/* Wine — Frederiksgade only */}
-            {showExtras && currentLoc?.hasWine && (
-              <Section title={t.drinks.tabWine} kanji="ワイン" count={wines.length + 1}>
-                {[houseWine, ...wines].map((w) => (
-                  <Row
-                    key={w.id}
-                    onClick={() => setModalIndex(indexOf(`wine-${w.id}`))}
-                    img={w.img ? `/images/wine/${w.img}.${w.ext ?? "png"}` : undefined}
-                    narrow
-                    name={w.name}
-                    desc={w.desc}
-                    price={w.price}
-                    badges={
-                      <span className="text-[10px] uppercase tracking-wide text-chilli/80">
-                        {w.type}
-                      </span>
-                    }
-                  />
-                ))}
-              </Section>
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {filtered.length === 0 && (
-          <p className="py-16 text-center text-cream/50">{t.menu.empty}</p>
+        {/* Mobile horizontal section rail */}
+        {railSections.length > 0 && (
+          <div className="sticky top-[124px] z-20 mx-auto mt-4 max-w-3xl lg:hidden">
+            <div className="flex gap-2 overflow-x-auto rounded-full border border-cream/10 bg-ink-deep/80 p-1.5 backdrop-blur-xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {railSections.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => jumpTo(s.id)}
+                  className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    activeSection === s.id
+                      ? "bg-cream text-ink"
+                      : "text-cream/60 hover:text-cream"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
+
+        {/* Menu body: desktop rail + list */}
+        <div className="mx-auto mt-12 grid max-w-5xl gap-10 lg:grid-cols-[180px_1fr]">
+          {/* Desktop section rail */}
+          {railSections.length > 0 && (
+            <aside className="hidden lg:block">
+              <nav className="sticky top-[150px] flex flex-col gap-1" aria-label={t.menu.kicker}>
+                {railSections.map((s) => {
+                  const isActive = activeSection === s.id;
+                  return (
+                    <button
+                      key={s.id}
+                      onClick={() => jumpTo(s.id)}
+                      className={`group flex items-center gap-3 border-l-2 py-1.5 pl-3 text-left text-sm transition-colors ${
+                        isActive
+                          ? "border-chilli text-cream"
+                          : "border-cream/10 text-cream/45 hover:border-cream/40 hover:text-cream/80"
+                      }`}
+                    >
+                      <span className="font-medium">{s.label}</span>
+                      <span className="font-display text-xs text-cream/25">
+                        {s.kanji}
+                      </span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </aside>
+          )}
+
+          {/* Menu list */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${loc}-${diet}-${query}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
+              className="min-w-0"
+            >
+              {grouped.map((group) => (
+                <Section
+                  key={group.cuisine}
+                  id={`sec-${group.cuisine}`}
+                  title={CUISINE_LABELS[group.cuisine][lang]}
+                  kanji={sectionKanji[group.cuisine]}
+                  count={group.items.length}
+                >
+                  {group.items.map((dish) => (
+                    <Row
+                      key={dish.id}
+                      onClick={() => setModalIndex(indexOf(`dish-${dish.id}`))}
+                      img={dish.hasImage ? `/images/dishes/${dish.id}.png` : undefined}
+                      number={dish.id}
+                      name={dish.name}
+                      desc={dish.desc}
+                      price={dish.price}
+                      badges={
+                        <>
+                          {dish.isNew && (
+                            <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
+                              {t.menu.newLabel}
+                            </span>
+                          )}
+                          <DietBadge dish={dish} />
+                          {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
+                        </>
+                      }
+                    />
+                  ))}
+                </Section>
+              ))}
+
+              {/* Drinks */}
+              {showExtras && (
+                <Section id="sec-drinks" title={t.drinks.tabDrinks} kanji="飲み物" count={drinks.length}>
+                  {drinks.map((d) => (
+                    <Row
+                      key={d.name}
+                      onClick={() => setModalIndex(indexOf(`drink-${d.name}`))}
+                      img={d.img ? `/images/drinks/${d.img}.png` : undefined}
+                      name={d.name}
+                      desc={
+                        d.options
+                          ? d.options.join(" · ")
+                          : d.lines?.map((l) => `${l.label} ${l.price},-`).join(" · ")
+                      }
+                      price={d.price}
+                    />
+                  ))}
+                </Section>
+              )}
+
+              {/* Wine — Frederiksgade only */}
+              {showExtras && currentLoc?.hasWine && (
+                <Section id="sec-wine" title={t.drinks.tabWine} kanji="ワイン" count={wines.length + 1}>
+                  {[houseWine, ...wines].map((w) => (
+                    <Row
+                      key={w.id}
+                      onClick={() => setModalIndex(indexOf(`wine-${w.id}`))}
+                      img={w.img ? `/images/wine/${w.img}.${w.ext ?? "png"}` : undefined}
+                      narrow
+                      name={w.name}
+                      desc={w.desc}
+                      price={w.price}
+                      badges={
+                        <span className="text-[10px] uppercase tracking-wide text-chilli/80">
+                          {w.type}
+                        </span>
+                      }
+                    />
+                  ))}
+                </Section>
+              )}
+
+              {filtered.length === 0 && (
+                <p className="py-16 text-center text-cream/50">{t.menu.empty}</p>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
       <ItemModal
@@ -328,18 +427,20 @@ export function Menu() {
 }
 
 function Section({
+  id,
   title,
   kanji,
   count,
   children,
 }: {
+  id: string;
   title: string;
   kanji: string;
   count: number;
   children: React.ReactNode;
 }) {
   return (
-    <div className="mb-14 scroll-mt-32">
+    <div id={id} className="mb-14 scroll-mt-32">
       <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
         <div className="flex items-baseline gap-3">
           <h3 className="heading-display text-2xl text-cream sm:text-3xl">{title}</h3>
