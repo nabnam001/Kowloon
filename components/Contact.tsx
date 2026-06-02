@@ -2,144 +2,112 @@
 
 import { useLang } from "./LangProvider";
 import { Reveal } from "./Reveal";
-import { contact, hours } from "@/data/site";
+import { locations } from "@/data/site";
 
 export function Contact() {
   const { t, lang } = useLang();
-
-  // Highlight today's row (0 = Sunday in JS)
-  const jsDay = new Date().getDay();
-  const todayIndex = jsDay === 0 ? 6 : jsDay - 1; // map to Mon..Sun order
-  const hoursRows = hours[lang];
-  const hoursNotes = hours.notes[lang];
 
   return (
     <section id="contact" className="relative scroll-mt-24 py-20 sm:py-28">
       <div className="container-x">
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="kicker justify-center">
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-8 bg-chilli" />
             {t.contact.kicker}
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-8 bg-chilli" />
           </span>
           <h2 className="heading-display mt-4 text-3xl text-cream sm:text-4xl">
             {t.contact.title}
           </h2>
+          <p className="mt-4 text-cream/60">{t.contact.bookText}</p>
         </Reveal>
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {/* Hours */}
-          <Reveal>
-            <div className="h-full rounded-3xl glass p-7">
-              <h3 className="font-display text-xl font-semibold text-gold">
-                {t.contact.hours}
-              </h3>
-              <ul className="mt-5 space-y-1">
-                {hoursRows.map((h, i) => (
-                  <li
-                    key={h.day}
-                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
-                      i === todayIndex
-                        ? "bg-gold/10 text-gold"
-                        : "text-cream/70"
-                    }`}
+        <div className="mx-auto mt-12 grid max-w-3xl gap-5 sm:grid-cols-2">
+          {locations.map((loc, i) => (
+            <Reveal key={loc.id} delay={i * 0.1}>
+              <div className="flex h-full flex-col rounded-2xl border border-cream/10 bg-ink-800/50 p-6">
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-gold">
+                  {loc.city}
+                </span>
+                <h3 className="mt-1 font-display text-xl font-semibold text-cream">
+                  {loc.name}
+                </h3>
+                <p className="mt-0.5 text-sm text-cream/55">{loc.address}</p>
+
+                <div className="mt-4 flex flex-col gap-2 text-sm">
+                  <a
+                    href={loc.phoneHref}
+                    className="flex items-center gap-2 text-cream/80 transition-colors hover:text-gold"
                   >
-                    <span className="font-medium">{h.day}</span>
-                    <span className={h.closed ? "text-chilli-glow" : ""}>
-                      {h.value}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="mt-4 space-y-1 border-t border-white/10 pt-4 text-xs text-cream/60">
-                {hoursNotes.map((n) => (
-                  <p key={n}>• {n}</p>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          {/* Booking note */}
-          <Reveal delay={0.1}>
-            <div className="flex h-full flex-col rounded-3xl border border-gold/20 bg-gradient-to-br from-chilli/15 to-indigo/20 p-7">
-              <h3 className="font-display text-xl font-semibold text-cream">
-                {t.contact.bookTitle}
-              </h3>
-              <p className="mt-4 flex-1 text-sm leading-relaxed text-cream/70">
-                {t.contact.bookText}
-              </p>
-              <div className="mt-6 space-y-3">
-                <a
-                  href="tel:+4586191998"
-                  className="btn-primary w-full text-sm"
-                >
-                  Frederiksgade · 86 19 19 98
-                </a>
-                <a
-                  href="tel:+4586194211"
-                  className="btn-ghost w-full text-sm"
-                >
-                  Banegårdsgade · 86 19 42 11
-                </a>
-              </div>
-            </div>
-          </Reveal>
-
-          {/* Reach / follow */}
-          <Reveal delay={0.2}>
-            <div className="h-full rounded-3xl glass p-7">
-              <h3 className="font-display text-xl font-semibold text-gold">
-                {t.contact.reach}
-              </h3>
-              <dl className="mt-5 space-y-4 text-sm">
-                <div>
-                  <dt className="text-cream/40">E-mail</dt>
-                  <dd>
-                    <a
-                      href={`mailto:${contact.email}`}
-                      className="text-cream transition-colors hover:text-gold"
-                    >
-                      {contact.email}
-                    </a>
-                    <p className="mt-0.5 text-xs text-cream/60">
-                      {contact.emailNote}
-                    </p>
-                  </dd>
+                    <PhoneIcon />
+                    {loc.phone}
+                  </a>
+                  <a
+                    href={`mailto:${loc.email}`}
+                    className="flex items-center gap-2 break-all text-cream/80 transition-colors hover:text-gold"
+                  >
+                    <MailIcon />
+                    {loc.email}
+                  </a>
                 </div>
-                <div>
-                  <dt className="text-cream/40">CVR</dt>
-                  <dd className="text-cream/80">{contact.cvr}</dd>
-                </div>
-              </dl>
 
-              <h4 className="mt-6 text-sm font-semibold text-cream">
-                {t.contact.follow}
-              </h4>
-              <div className="mt-3 flex gap-3">
-                <a
-                  href={contact.facebook}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-11 w-11 items-center justify-center rounded-full glass text-cream transition-all hover:bg-gold hover:text-ink"
-                  aria-label="Facebook"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z" />
-                  </svg>
-                </a>
-                <a
-                  href={contact.eliteSmiley}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-11 items-center gap-2 rounded-full glass px-4 text-xs text-cream transition-all hover:bg-gold hover:text-ink"
-                >
-                  Elite Smiley
-                </a>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <a href={loc.phoneHref} className="btn-primary text-sm">
+                    {t.locations.call}
+                  </a>
+                  <a
+                    href={loc.mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-ghost text-sm"
+                  >
+                    {t.locations.directions}
+                  </a>
+                  <a
+                    href={loc.facebook}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 text-cream transition-colors hover:border-cream hover:text-gold"
+                    aria-label="Facebook"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z" />
+                    </svg>
+                  </a>
+                </div>
               </div>
-            </div>
-          </Reveal>
+            </Reveal>
+          ))}
         </div>
+
+        <p className="mx-auto mt-8 max-w-xl text-center text-xs text-cream/45">
+          {lang === "da"
+            ? "Bordbestilling og take-away klares over telefonen eller i restauranten — ikke via mail. Se åbningstider under “Find os”."
+            : "Table booking and take-away are handled by phone or in the restaurant — not by email. See opening hours under “Find us”."}
+        </p>
       </div>
     </section>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L17 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 4 6a2 2 0 0 1 1-2Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.6" />
+      <path d="m4 7 8 6 8-6" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+    </svg>
   );
 }
