@@ -64,7 +64,7 @@ export function DishModal({
             {/* Hero plate stage */}
             <div className="relative h-72 overflow-hidden">
               {/* ambient backdrop */}
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(44,34,118,0.6),transparent_70%)]" />
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(178,58,46,0.25),transparent_70%)]" />
               {/* oversized dish-number watermark */}
               <span
                 aria-hidden
@@ -80,7 +80,7 @@ export function DishModal({
                     className="absolute h-52 w-52 rounded-full"
                     style={{
                       background:
-                        "conic-gradient(from 0deg, rgba(221,38,39,0.35), rgba(232,184,115,0.3), rgba(44,34,118,0.35), rgba(221,38,39,0.35))",
+                        "conic-gradient(from 0deg, rgba(178,58,46,0.28), rgba(236,230,218,0.18), rgba(178,58,46,0.28), rgba(236,230,218,0.18))",
                       filter: "blur(28px)",
                     }}
                     animate={reduce ? undefined : { rotate: 360 }}

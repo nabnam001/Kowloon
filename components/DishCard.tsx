@@ -5,6 +5,7 @@ import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import type { Dish } from "@/data/menu";
 import { useLang } from "./LangProvider";
 import { SpiceMeter } from "./SpiceMeter";
+import { DietBadge } from "./DietBadge";
 
 export function DishCard({
   dish,
@@ -49,9 +50,9 @@ export function DishCard({
       onMouseLeave={onLeave}
       style={{ rotateX, rotateY, transformStyle: "preserve-3d", transformPerspective: 900 }}
       aria-label={`${dish.name} — ${dish.price} kr. ${t.menu.details}`}
-      className="group relative flex flex-col overflow-hidden rounded-3xl glass text-left transition-shadow duration-500 hover:border-gold/30 hover:shadow-xl hover:shadow-chilli/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-cream/10 bg-ink-800/60 text-left transition-shadow duration-500 hover:border-cream/25 hover:shadow-xl hover:shadow-black/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-indigo-deep/60 to-ink">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-ink-700 to-ink">
         {dish.hasImage ? (
           <Image
             src={`/images/dishes/${dish.id}.png`}
@@ -59,7 +60,7 @@ export function DishCard({
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             style={{ transform: "translateZ(40px)" }}
-            className="object-contain p-3 transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2"
+            className="object-contain p-3 drop-shadow-[0_10px_18px_rgba(0,0,0,0.5)] transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2"
           />
         ) : (
           <div className="flex h-full items-center justify-center text-cream/20">
@@ -74,21 +75,17 @@ export function DishCard({
           </div>
         )}
 
-        <span className="absolute left-3 top-3 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-bold text-gold backdrop-blur">
+        <span className="absolute left-3 top-3 rounded-full bg-ink/70 px-2.5 py-1 text-xs font-bold text-cream backdrop-blur">
           #{dish.id}
         </span>
 
         <div className="absolute right-3 top-3 flex flex-col items-end gap-1.5">
           {dish.isNew && (
-            <span className="rounded-full bg-gold px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink">
+            <span className="rounded-full bg-cream px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink">
               {t.menu.newLabel}
             </span>
           )}
-          {dish.veg && (
-            <span className="rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-bold text-white">
-              🌱
-            </span>
-          )}
+          <DietBadge dish={dish} />
         </div>
 
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-ink-800 to-transparent" />
@@ -110,7 +107,7 @@ export function DishCard({
         )}
         <div className="mt-auto flex items-center justify-between pt-2">
           <SpiceMeter level={dish.spice ?? 0} />
-          <span className="flex items-center gap-1 text-xs font-medium text-gold/70 transition-colors group-hover:text-gold">
+          <span className="flex items-center gap-1 text-xs font-medium text-cream/60 transition-colors group-hover:text-cream">
             {t.menu.details}
             <svg
               width="14"

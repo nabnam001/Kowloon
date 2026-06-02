@@ -52,12 +52,12 @@ export function Intro() {
           }}
         >
           {/* ambient glows */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(221,38,39,0.25),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(178,58,46,0.18),transparent_60%)]" />
           <motion.div
             className="absolute left-1/2 top-1/2 h-[40rem] w-[40rem] -translate-x-1/2 -translate-y-1/2 rounded-full"
             style={{
               background:
-                "conic-gradient(from 0deg, rgba(221,38,39,0.3), rgba(232,184,115,0.25), rgba(44,34,118,0.3), rgba(221,38,39,0.3))",
+                "conic-gradient(from 0deg, rgba(178,58,46,0.22), rgba(236,230,218,0.16), rgba(178,58,46,0.22), rgba(236,230,218,0.16))",
               filter: "blur(60px)",
             }}
             animate={{ rotate: 360 }}

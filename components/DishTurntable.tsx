@@ -3,272 +3,255 @@
 import Image from "next/image";
 import {
   motion,
-  useMotionValue,
-  useTransform,
+  AnimatePresence,
   useReducedMotion,
-  animate,
   type PanInfo,
 } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Dish } from "@/data/menu";
 import { SpiceMeter } from "./SpiceMeter";
+import { DietBadge } from "./DietBadge";
+import { Steam } from "./Steam";
 import { useLang } from "./LangProvider";
 
 /**
- * A 3D carousel / "lazy Susan" of dishes. Drag horizontally (or use arrows /
- * arrow keys) to spin the table. The dish at the front is highlighted with its
- * name, price and details. Built for touch, mouse and keyboard.
+ * A clean "coverflow" presenter of signature dishes. One large center dish
+ * (with rising steam) is flanked by smaller, dimmer neighbours — no overlap.
+ * Drag, arrows, dots and arrow keys all cycle the selection. Auto-advances
+ * gently until the user interacts.
  */
 export function DishTurntable({
   dishes,
   accent,
   accentSoft,
-  glow,
   onOpen,
 }: {
   dishes: Dish[];
   accent: string;
   accentSoft: string;
-  glow: string;
+  glow?: string;
   onOpen: (d: Dish) => void;
 }) {
   const { t } = useLang();
   const reduce = useReducedMotion();
   const count = dishes.length;
-  const step = 360 / Math.max(count, 1);
-  // radius scales with how many dishes so they don't overlap
-  const radius = Math.round(150 + count * 14);
 
-  const rotation = useMotionValue(0);
   const [active, setActive] = useState(0);
   const interactedRef = useRef(false);
 
-  // Which dish faces the viewer for a given rotation
-  const indexFromRotation = (r: number) => {
-    const norm = ((-r % 360) + 360) % 360;
-    return Math.round(norm / step) % count;
-  };
+  const go = useCallback(
+    (next: number) => {
+      setActive(((next % count) + count) % count);
+    },
+    [count]
+  );
 
-  useEffect(() => {
-    const unsub = rotation.on("change", (r) => {
-      const idx = indexFromRotation(r);
-      setActive((prev) => (prev === idx ? prev : idx));
-    });
-    return () => unsub();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [count, step]);
-
-  // Reset to the first dish whenever the destination (dish set) changes
+  // reset when the destination changes
   useEffect(() => {
     interactedRef.current = false;
-    rotation.set(0);
     setActive(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dishes]);
 
-  // Gentle "chef's pick" auto-spin until the user interacts
+  // gentle auto-advance until interaction
   useEffect(() => {
     if (reduce) return;
     const id = window.setInterval(() => {
       if (interactedRef.current) return;
-      const current = rotation.get();
-      animate(rotation, current - step, {
-        type: "spring",
-        stiffness: 60,
-        damping: 18,
-      });
-    }, 2800);
+      setActive((a) => (a + 1) % count);
+    }, 3200);
     return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce, step, dishes]);
+  }, [reduce, count]);
 
-  const markInteracted = () => {
+  const mark = () => {
     interactedRef.current = true;
   };
-
-  const goTo = (idx: number) => {
-    markInteracted();
-    // shortest path to face dish `idx`
-    const current = rotation.get();
-    const target = -idx * step;
-    let delta = ((target - current) % 360 + 540) % 360 - 180;
-    animate(rotation, current + delta, {
-      type: "spring",
-      stiffness: 80,
-      damping: 16,
-    });
+  const next = () => {
+    mark();
+    go(active + 1);
+  };
+  const prev = () => {
+    mark();
+    go(active - 1);
   };
 
-  const spin = (dir: 1 | -1) => goTo((active + dir + count) % count);
-
   const onDragEnd = (_: unknown, info: PanInfo) => {
-    markInteracted();
-    const current = rotation.get();
-    const velocity = info.velocity.x;
-    const momentum = velocity * 0.08;
-    const projected = current + momentum;
-    const snapped = Math.round(projected / step) * step;
-    animate(rotation, snapped, {
-      type: "spring",
-      stiffness: 70,
-      damping: 14,
-    });
+    mark();
+    if (info.offset.x < -60 || info.velocity.x < -300) next();
+    else if (info.offset.x > 60 || info.velocity.x > 300) prev();
   };
 
   const activeDish = dishes[active];
 
+  // relative offset of a dish from the active one, in range [-half, half]
+  const offsetOf = (i: number) => {
+    let d = i - active;
+    if (d > count / 2) d -= count;
+    if (d < -count / 2) d += count;
+    return d;
+  };
+
   return (
     <div className="flex w-full flex-col items-center">
       {/* Stage */}
-      <div
-        className="relative h-[300px] w-full select-none sm:h-[360px]"
-        style={{ perspective: "1400px" }}
+      <motion.div
+        className="relative h-[280px] w-full max-w-3xl cursor-grab touch-pan-y select-none active:cursor-grabbing sm:h-[340px]"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.12}
+        onDragStart={mark}
+        onDragEnd={onDragEnd}
       >
-        {/* Floor glow */}
+        {/* soft ground line */}
         <div
-          className="pointer-events-none absolute left-1/2 top-[58%] h-40 w-[80%] -translate-x-1/2 rounded-[100%] blur-2xl"
-          style={{ background: glow }}
+          className="pointer-events-none absolute bottom-12 left-1/2 h-px w-[70%] -translate-x-1/2"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${accent}33, transparent)`,
+          }}
         />
 
-        <motion.div
-          className="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing"
-          style={{
-            transformStyle: "preserve-3d",
-            rotateY: rotation,
-            // tilt the table slightly so it reads as 3D
-            rotateX: 8,
-          }}
-          drag="x"
-          dragElastic={0.06}
-          dragMomentum={false}
-          onPointerDown={markInteracted}
-          onDrag={(_, info) => rotation.set(rotation.get() + info.delta.x * 0.35)}
-          onDragEnd={onDragEnd}
-        >
-          {/* rotating table surface (laid flat) */}
-          <div
-            className="absolute left-1/2 top-1/2"
-            style={{
-              width: radius * 2.5,
-              height: radius * 2.5,
-              transform: "translate(-50%, -50%) rotateX(82deg)",
-              transformStyle: "preserve-3d",
-            }}
-            aria-hidden
-          >
-            <div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: `radial-gradient(circle at 50% 50%, ${accent}14, rgba(255,255,255,0.05) 55%, transparent 72%)`,
-                border: `1px solid ${accent}22`,
-                boxShadow: `0 0 60px ${accent}18`,
-              }}
-            />
-            {/* inner ring detail */}
-            <div
-              className="absolute inset-[18%] rounded-full"
-              style={{ border: "1px dashed rgba(247,241,230,0.10)" }}
-            />
-          </div>
-
-          {dishes.map((dish, i) => (
-            <Plate
+        {dishes.map((dish, i) => {
+          const off = offsetOf(i);
+          const abs = Math.abs(off);
+          if (abs > 2) return null; // only render the visible neighbourhood
+          const isActive = off === 0;
+          return (
+            <motion.button
               key={dish.id}
-              dish={dish}
-              angle={i * step}
-              radius={radius}
-              rotation={rotation}
-              isActive={i === active}
-              accent={accent}
-              onOpen={onOpen}
-            />
-          ))}
-        </motion.div>
-      </div>
+              onClick={() => {
+                mark();
+                if (isActive) onOpen(dish);
+                else go(i);
+              }}
+              aria-hidden={!isActive}
+              tabIndex={isActive ? 0 : -1}
+              className="absolute left-1/2 top-1/2"
+              initial={false}
+              animate={{
+                x: `calc(-50% + ${off * 38}%)`,
+                y: "-50%",
+                scale: isActive ? 1 : 0.62 - (abs - 1) * 0.1,
+                opacity: abs > 1 ? 0 : isActive ? 1 : 0.45,
+                zIndex: 10 - abs,
+                filter: isActive ? "blur(0px)" : "blur(1px)",
+              }}
+              transition={{ type: "spring", stiffness: 140, damping: 22 }}
+              style={{ width: "min(62vw, 280px)", height: "min(62vw, 280px)" }}
+            >
+              {/* spotlight pool */}
+              <div
+                className="absolute left-1/2 top-1/2 h-[82%] w-[82%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+                style={{
+                  background: isActive
+                    ? `radial-gradient(circle at 50% 42%, ${accent}33, transparent 68%)`
+                    : "radial-gradient(circle at 50% 42%, rgba(236,230,218,0.05), transparent 66%)",
+                }}
+              />
+              {/* contact shadow */}
+              <div className="absolute bottom-[10%] left-1/2 h-4 w-[55%] -translate-x-1/2 rounded-[100%] bg-black/60 blur-md" />
+              {/* steam on the active dish */}
+              {isActive && (
+                <Steam className="left-1/2 top-[14%] -translate-x-1/2" count={3} />
+              )}
+              {/* dish */}
+              {dish.hasImage && (
+                <div className="absolute inset-[7%]">
+                  <Image
+                    src={`/images/dishes/${dish.id}.png`}
+                    alt={dish.name}
+                    fill
+                    sizes="280px"
+                    className="object-contain drop-shadow-[0_18px_26px_rgba(0,0,0,0.55)]"
+                  />
+                </div>
+              )}
+            </motion.button>
+          );
+        })}
+      </motion.div>
 
       {/* Active dish details */}
-      <div className="relative mt-2 flex min-h-[150px] w-full max-w-md flex-col items-center text-center">
-        {activeDish && (
-          <motion.div
-            key={activeDish.id}
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className="flex flex-col items-center"
-          >
-            <div className="flex items-center gap-2">
-              <span
-                className="rounded-full px-2.5 py-0.5 text-xs font-bold text-ink"
-                style={{ background: accentSoft }}
-              >
-                #{activeDish.id}
-              </span>
-              {activeDish.isNew && (
-                <span className="rounded-full bg-gold px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink">
-                  {t.menu.newLabel}
+      <div className="relative mt-2 flex min-h-[160px] w-full max-w-md flex-col items-center text-center">
+        <AnimatePresence mode="wait">
+          {activeDish && (
+            <motion.div
+              key={activeDish.id}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.35 }}
+              className="flex flex-col items-center"
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="rounded-full px-2.5 py-0.5 text-xs font-bold text-ink"
+                  style={{ background: accentSoft }}
+                >
+                  #{activeDish.id}
                 </span>
+                {activeDish.isNew && (
+                  <span className="rounded-full bg-cream px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink">
+                    {t.menu.newLabel}
+                  </span>
+                )}
+                <DietBadge dish={activeDish} />
+                {activeDish.spice ? <SpiceMeter level={activeDish.spice} /> : null}
+              </div>
+              <h3 className="heading-display mt-3 text-2xl text-cream sm:text-3xl">
+                {activeDish.name}
+              </h3>
+              {activeDish.desc && (
+                <p className="mt-2 max-w-sm text-sm leading-relaxed text-cream/60">
+                  {activeDish.desc}
+                </p>
               )}
-              {activeDish.spice ? <SpiceMeter level={activeDish.spice} /> : null}
-            </div>
-            <h3 className="heading-display mt-3 text-2xl text-cream sm:text-3xl">
-              {activeDish.name}
-            </h3>
-            {activeDish.desc && (
-              <p className="mt-2 max-w-sm text-sm leading-relaxed text-cream/60">
-                {activeDish.desc}
-              </p>
-            )}
-            <div className="mt-4 flex items-center gap-4">
-              <span
-                className="font-display text-2xl font-bold"
-                style={{ color: accentSoft }}
-              >
-                {activeDish.price},-
-              </span>
-              <button
-                onClick={() => onOpen(activeDish)}
-                className="rounded-full border px-4 py-1.5 text-xs font-semibold transition-colors"
-                style={{ borderColor: accent, color: accentSoft }}
-              >
-                {t.menu.details}
-              </button>
-            </div>
-          </motion.div>
-        )}
+              <div className="mt-4 flex items-center gap-4">
+                <span className="font-display text-2xl font-bold text-cream">
+                  {activeDish.price},-
+                </span>
+                <button
+                  onClick={() => onOpen(activeDish)}
+                  className="rounded-full border border-cream/30 px-4 py-1.5 text-xs font-semibold text-cream transition-colors hover:border-cream hover:bg-cream/10"
+                >
+                  {t.menu.details}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Controls */}
       <div className="mt-5 flex items-center gap-5">
         <button
-          onClick={() => spin(-1)}
-          className="flex h-11 w-11 items-center justify-center rounded-full glass text-cream transition-transform hover:scale-110 active:scale-95"
-          aria-label="Forrige ret"
-          style={{ borderColor: accent }}
+          onClick={prev}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 text-cream transition-colors hover:border-cream hover:bg-cream/10"
+          aria-label={t.menu.prev}
         >
           <Arrow dir="left" />
         </button>
 
-        {/* dots */}
         <div className="flex max-w-[180px] flex-wrap justify-center gap-1.5">
           {dishes.map((d, i) => (
             <button
               key={d.id}
-              onClick={() => goTo(i)}
-              aria-label={`${d.name}`}
+              onClick={() => {
+                mark();
+                go(i);
+              }}
+              aria-label={d.name}
               className="h-2 rounded-full transition-all"
               style={{
                 width: i === active ? 22 : 8,
-                background: i === active ? accentSoft : "rgba(247,241,230,0.25)",
+                background: i === active ? accentSoft : "rgba(236,230,218,0.25)",
               }}
             />
           ))}
         </div>
 
         <button
-          onClick={() => spin(1)}
-          className="flex h-11 w-11 items-center justify-center rounded-full glass text-cream transition-transform hover:scale-110 active:scale-95"
-          aria-label="Næste ret"
-          style={{ borderColor: accent }}
+          onClick={next}
+          className="flex h-11 w-11 items-center justify-center rounded-full border border-cream/20 text-cream transition-colors hover:border-cream hover:bg-cream/10"
+          aria-label={t.menu.nextDish}
         >
           <Arrow dir="right" />
         </button>
@@ -278,82 +261,6 @@ export function DishTurntable({
         {t.journey.dragHint}
       </p>
     </div>
-  );
-}
-
-function Plate({
-  dish,
-  angle,
-  radius,
-  rotation,
-  isActive,
-  accent,
-  onOpen,
-}: {
-  dish: Dish;
-  angle: number;
-  radius: number;
-  rotation: ReturnType<typeof useMotionValue<number>>;
-  isActive: boolean;
-  accent: string;
-  onOpen: (d: Dish) => void;
-}) {
-  // counter-rotate each plate so the image always faces the viewer (billboard)
-  const counter = useTransform(rotation, (r) => -r);
-  const transform = useMemo(
-    () => `rotateY(${angle}deg) translateZ(${radius}px)`,
-    [angle, radius]
-  );
-
-  return (
-    <motion.button
-      className="absolute left-1/2 top-1/2 h-44 w-44 sm:h-52 sm:w-52"
-      style={{
-        transformStyle: "preserve-3d",
-        transform,
-        x: "-50%",
-        y: "-50%",
-      }}
-      onClick={() => isActive && onOpen(dish)}
-      tabIndex={isActive ? 0 : -1}
-      aria-hidden={!isActive}
-    >
-      <motion.div
-        style={{ rotateY: counter }}
-        className="relative flex h-full w-full items-center justify-center"
-        animate={{
-          scale: isActive ? 1.12 : 0.82,
-          opacity: isActive ? 1 : 0.5,
-        }}
-        transition={{ type: "spring", stiffness: 120, damping: 18 }}
-      >
-        {/* spotlight pool behind the dish */}
-        <div
-          className="absolute left-1/2 top-1/2 h-[78%] w-[78%] -translate-x-1/2 -translate-y-1/2 rounded-full transition-opacity"
-          style={{
-            background: isActive
-              ? `radial-gradient(circle at 50% 42%, ${accent}38, ${accent}10 45%, transparent 70%)`
-              : "radial-gradient(circle at 50% 42%, rgba(255,255,255,0.06), transparent 68%)",
-          }}
-        />
-
-        {/* elliptical contact shadow grounding the plate */}
-        <div className="absolute bottom-[12%] left-1/2 h-4 w-[58%] -translate-x-1/2 rounded-[100%] bg-black/55 blur-md" />
-
-        {/* the plated dish photo */}
-        {dish.hasImage && (
-          <div className="relative h-[86%] w-[86%]">
-            <Image
-              src={`/images/dishes/${dish.id}.png`}
-              alt={dish.name}
-              fill
-              sizes="208px"
-              className="object-contain drop-shadow-[0_16px_24px_rgba(0,0,0,0.5)]"
-            />
-          </div>
-        )}
-      </motion.div>
-    </motion.button>
   );
 }
 

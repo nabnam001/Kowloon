@@ -9,6 +9,7 @@ import { DishTurntable } from "./DishTurntable";
 import { DishModal } from "./DishModal";
 import { AsiaMap } from "./AsiaMap";
 import { SceneParticles } from "./SceneParticles";
+import { InkBackdrop } from "./InkBackdrop";
 import { useSound } from "./SoundProvider";
 
 export function Journey() {
@@ -87,6 +88,8 @@ export function Journey() {
         />
       </AnimatePresence>
 
+      {/* temple silhouettes */}
+      <InkBackdrop variant="soft" />
       {/* drifting cultural motifs */}
       <Motifs themeKey={theme.key} accent={theme.accentSoft} />
       {/* per-destination ambient particles */}

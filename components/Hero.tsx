@@ -11,6 +11,8 @@ import {
 } from "framer-motion";
 import { useRef } from "react";
 import { useLang } from "./LangProvider";
+import { InkBackdrop } from "./InkBackdrop";
+import { Steam } from "./Steam";
 
 export function Hero() {
   const { t } = useLang();
@@ -21,20 +23,19 @@ export function Hero() {
     offset: ["start start", "end start"],
   });
 
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const yText = useTransform(scrollYProgress, [0, 1], ["0%", "90%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const dishY = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
-  const dishRotate = useTransform(scrollYProgress, [0, 1], [0, 35]);
+  const dishY = useTransform(scrollYProgress, [0, 1], ["0%", "-24%"]);
 
   // pointer-based parallax for the hero dish
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const dishX = useSpring(useTransform(mx, [-0.5, 0.5], [-24, 24]), {
+  const dishX = useSpring(useTransform(mx, [-0.5, 0.5], [-20, 20]), {
     stiffness: 60,
     damping: 18,
   });
-  const dishTilt = useSpring(useTransform(my, [-0.5, 0.5], [10, -10]), {
+  const dishTilt = useSpring(useTransform(my, [-0.5, 0.5], [6, -6]), {
     stiffness: 60,
     damping: 18,
   });
@@ -53,50 +54,43 @@ export function Hero() {
       onMouseMove={onMouse}
       className="relative grain flex min-h-[100svh] items-center overflow-hidden"
     >
-      {/* Background — Hong Kong night */}
+      {/* Ink background with temple silhouettes */}
       <motion.div style={{ y: reduce ? 0 : yBg }} className="absolute inset-0 -z-20">
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-deep via-indigo-deep to-ink" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink-deep via-ink to-ink" />
         <Image
           src="/images/venue/interior-bg.jpg"
           alt=""
           fill
           priority
           sizes="100vw"
-          className="object-cover opacity-25 mix-blend-luminosity"
+          className="object-cover opacity-[0.12] mix-blend-luminosity grayscale"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-deep/85 via-indigo-deep/70 to-ink" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(221,38,39,0.28),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(44,34,118,0.55),transparent_50%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink-deep/80 via-ink/70 to-ink" />
+        <InkBackdrop variant="hero" />
       </motion.div>
 
-      {/* Floating lantern glows */}
-      <Lanterns reduce={!!reduce} />
-      {/* drifting embers */}
-      <Embers reduce={!!reduce} />
-
-      {/* Hero signature dish with layered glow + steam */}
+      {/* Hero signature dish (mono ink halo + steam) */}
       <motion.div
         style={{ y: reduce ? 0 : dishY, x: reduce ? 0 : dishX }}
-        className="pointer-events-none absolute right-[-8%] top-1/2 -z-10 hidden -translate-y-1/2 lg:block"
+        className="pointer-events-none absolute right-[-6%] top-1/2 -z-10 hidden -translate-y-1/2 lg:block"
       >
         <motion.div
-          style={{ rotate: reduce ? 0 : dishRotate, rotateX: reduce ? 0 : dishTilt }}
-          className="relative h-[40rem] w-[40rem]"
+          style={{ rotateX: reduce ? 0 : dishTilt }}
+          className="relative h-[38rem] w-[38rem]"
         >
-          {/* rotating halo */}
-          <motion.div
-            className="absolute inset-8 rounded-full"
+          {/* soft ink halo (mono) */}
+          <div
+            className="absolute inset-12 rounded-full"
             style={{
               background:
-                "conic-gradient(from 0deg, rgba(221,38,39,0.25), rgba(232,184,115,0.2), rgba(44,34,118,0.25), rgba(221,38,39,0.25))",
-              filter: "blur(40px)",
+                "radial-gradient(circle at 50% 45%, rgba(236,230,218,0.10), rgba(178,58,46,0.06) 45%, transparent 70%)",
+              filter: "blur(30px)",
             }}
-            animate={reduce ? undefined : { rotate: 360 }}
-            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
           />
-          <Steam reduce={!!reduce} />
+          <div className="absolute bottom-16 left-1/2 h-6 w-[55%] -translate-x-1/2 rounded-[100%] bg-black/60 blur-xl" />
+          <Steam className="left-1/2 top-[20%] -translate-x-1/2" count={4} />
           <motion.div
-            animate={reduce ? undefined : { y: [0, -16, 0] }}
+            animate={reduce ? undefined : { y: [0, -14, 0] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
             className="relative h-full w-full"
           >
@@ -105,7 +99,7 @@ export function Hero() {
               alt=""
               fill
               priority
-              className="object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.7)]"
+              className="object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.75)]"
             />
           </motion.div>
         </motion.div>
@@ -122,7 +116,7 @@ export function Hero() {
             transition={{ delay: 0.2 }}
             className="kicker"
           >
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-8 bg-chilli" />
             {t.hero.kicker}
           </motion.span>
 
@@ -185,9 +179,9 @@ export function Hero() {
             transition={{ delay: 1.05 }}
             className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 text-xs text-cream/50"
           >
-            <Trust>⭐ Elite Smiley</Trust>
-            <Trust>🇨🇳 🇹🇭 🇻🇳 {t.hero.trustKitchens}</Trust>
-            <Trust>📍 Aarhus C</Trust>
+            <Trust>Elite Smiley</Trust>
+            <Trust>{t.hero.trustKitchens}</Trust>
+            <Trust>Aarhus C · 1999</Trust>
           </motion.div>
         </div>
       </motion.div>
@@ -206,7 +200,7 @@ export function Hero() {
             transition={{ duration: 1.6, repeat: Infinity }}
             className="flex h-9 w-5 items-start justify-center rounded-full border border-cream/30 p-1"
           >
-            <span className="h-2 w-1 rounded-full bg-gold" />
+            <span className="h-2 w-1 rounded-full bg-chilli" />
           </motion.span>
         </div>
       </motion.div>
@@ -218,84 +212,8 @@ export function Hero() {
 
 function Trust({ children }: { children: React.ReactNode }) {
   return (
-    <span className="flex items-center gap-1.5 whitespace-nowrap">{children}</span>
-  );
-}
-
-function Steam({ reduce }: { reduce: boolean }) {
-  if (reduce) return null;
-  return (
-    <div className="pointer-events-none absolute left-1/2 top-[18%] -z-0 -translate-x-1/2" aria-hidden>
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="absolute block h-24 w-2 rounded-full bg-white/20 blur-md"
-          style={{ left: (i - 1) * 26 }}
-          animate={{ opacity: [0, 0.5, 0], y: [-10, -90], scaleX: [1, 1.8] }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            delay: i * 0.9,
-            ease: "easeOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function Lanterns({ reduce }: { reduce: boolean }) {
-  const lanterns = [
-    { left: "8%", top: "18%", size: 90, delay: 0 },
-    { left: "22%", top: "60%", size: 60, delay: 1.5 },
-    { left: "70%", top: "22%", size: 70, delay: 0.8 },
-    { left: "85%", top: "70%", size: 110, delay: 2.2 },
-    { left: "45%", top: "12%", size: 50, delay: 1.1 },
-  ];
-  return (
-    <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-      {lanterns.map((l, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-chilli/30 blur-2xl"
-          style={{ left: l.left, top: l.top, width: l.size, height: l.size }}
-          animate={reduce ? { opacity: 0.4 } : { opacity: [0.3, 0.7, 0.3], y: [0, -20, 0] }}
-          transition={{
-            duration: 6 + i,
-            repeat: Infinity,
-            delay: l.delay,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function Embers({ reduce }: { reduce: boolean }) {
-  if (reduce) return null;
-  const embers = Array.from({ length: 14 });
-  return (
-    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
-      {embers.map((_, i) => {
-        const left = (i * 37) % 100;
-        const size = 2 + (i % 3);
-        const dur = 8 + (i % 5) * 2;
-        return (
-          <motion.span
-            key={i}
-            className="absolute rounded-full bg-gold/60"
-            style={{ left: `${left}%`, bottom: -10, width: size, height: size }}
-            animate={{ y: [0, -600], opacity: [0, 0.8, 0], x: [0, (i % 2 ? 30 : -30)] }}
-            transition={{
-              duration: dur,
-              repeat: Infinity,
-              delay: (i % 7) * 1.2,
-              ease: "easeOut",
-            }}
-          />
-        );
-      })}
-    </div>
+    <span className="flex items-center gap-1.5 whitespace-nowrap border-l border-cream/15 pl-3 first:border-0 first:pl-0">
+      {children}
+    </span>
   );
 }

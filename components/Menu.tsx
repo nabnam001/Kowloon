@@ -22,14 +22,14 @@ const cuisineOrder: (Cuisine | "all")[] = [
 ];
 
 const cuisineGlow: Record<Cuisine | "all", string> = {
-  all: "rgba(221,38,39,0.14)",
-  forret: "rgba(232,184,115,0.16)",
-  kina: "rgba(226,59,59,0.18)",
-  thailand: "rgba(19,185,129,0.16)",
-  vietnam: "rgba(242,193,78,0.16)",
-  vegetar: "rgba(52,224,168,0.16)",
-  grill: "rgba(232,184,115,0.16)",
-  dessert: "rgba(244,114,182,0.16)",
+  all: "rgba(178,58,46,0.10)",
+  forret: "rgba(236,230,218,0.06)",
+  kina: "rgba(178,58,46,0.12)",
+  thailand: "rgba(236,230,218,0.07)",
+  vietnam: "rgba(178,58,46,0.10)",
+  vegetar: "rgba(52,211,153,0.08)",
+  grill: "rgba(236,230,218,0.06)",
+  dessert: "rgba(236,230,218,0.07)",
 };
 
 export function Menu() {
@@ -112,7 +112,7 @@ export function Menu() {
                     {isActive && (
                       <motion.span
                         layoutId="cuisine-pill"
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-gold to-gold-soft"
+                        className="absolute inset-0 rounded-full bg-cream"
                         transition={{ type: "spring", damping: 28, stiffness: 320 }}
                       />
                     )}
@@ -120,6 +120,16 @@ export function Menu() {
                   </button>
                 );
               })}
+              {/* jump to drinks & wine */}
+              <a
+                href="#drinks"
+                className="ml-1 flex items-center gap-1.5 whitespace-nowrap rounded-full border border-cream/15 px-4 py-2 text-sm font-semibold text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
+              >
+                {t.drinks.tabDrinks} & {t.drinks.tabWine}
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
             </div>
 
             {/* Diet chips + search */}

@@ -35,8 +35,8 @@ body {
 
 /* Custom selection */
 ::selection {
-  background: #dd2627;
-  color: #fff;
+  background: #b23a2e;
+  color: #ece6da;
 }
 
 /* Scrollbar */
@@ -45,14 +45,14 @@ body {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #13111f;
+  background: #0b0b0c;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3b318f;
+  background: #2b2b30;
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #2c2276;
+  background: #3a3a40;
 }
 
 @layer components {
@@ -84,9 +84,9 @@ body {
     @apply border border-white/10 bg-white/[0.04] backdrop-blur-xl;
   }
 
-  /* Decorative gold gradient text */
+  /* Decorative monochrome stone gradient text */
   .text-gold-grad {
-    background: linear-gradient(120deg, #f2d6a8 0%, #e8b873 40%, #c8923f 100%);
+    background: linear-gradient(120deg, #ece6da 0%, #bcb2a0 50%, #9a8f7b 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -104,7 +104,7 @@ body {
   button:focus-visible,
   input:focus-visible,
   [tabindex]:focus-visible {
-    outline: 2px solid #e8b873;
+    outline: 2px solid #bcb2a0;
     outline-offset: 2px;
     border-radius: 4px;
   }

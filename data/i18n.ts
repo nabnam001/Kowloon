@@ -63,6 +63,8 @@ export const translations = {
       noImage: "Foto følger snart",
       details: "Detaljer",
       close: "Luk",
+      prev: "Forrige ret",
+      nextDish: "Næste ret",
       count: (n: number) => `${n} retter`,
     },
     deals: {
@@ -221,6 +223,8 @@ export const translations = {
       noImage: "Photo coming soon",
       details: "Details",
       close: "Close",
+      prev: "Previous dish",
+      nextDish: "Next dish",
       count: (n: number) => `${n} dishes`,
     },
     deals: {

@@ -4,8 +4,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import { cuisineThemes, type JourneyKey } from "@/data/cuisineThemes";
 
 /**
- * A stylised map of East/Southeast Asia. The active destination pulses and an
- * animated dashed flight path connects to it. Decorative — hidden from a11y tree.
+ * A stylised ink map of East & Southeast Asia (China + the Indochina
+ * peninsula). The active destination pulses and an animated flight path is
+ * drawn from Denmark. Recognisable but artistic — decorative, aria-hidden.
  */
 export function AsiaMap({
   activeKey,
@@ -16,102 +17,139 @@ export function AsiaMap({
 }) {
   const reduce = useReducedMotion();
   const active = cuisineThemes.find((c) => c.key === activeKey)!;
-  // Aarhus origin point (top-left "home")
-  const origin = { x: 70, y: 70 };
+  const origin = { x: 60, y: 54 }; // Denmark, off to the NW
   const dest = active.mapPoint;
+
+  const ink = "#ECE6DA";
 
   return (
     <div className="relative mx-auto w-full max-w-md" aria-hidden="true">
-      <svg viewBox="0 0 400 300" className="h-auto w-full">
+      <svg viewBox="0 0 480 420" className="h-auto w-full">
         <defs>
           <radialGradient id="map-glow" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={active.accent} stopOpacity="0.5" />
             <stop offset="100%" stopColor={active.accent} stopOpacity="0" />
           </radialGradient>
-          <linearGradient id="land" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="rgba(247,241,230,0.10)" />
-            <stop offset="100%" stopColor="rgba(247,241,230,0.04)" />
-          </linearGradient>
         </defs>
 
-        {/* glow behind the active destination */}
+        {/* graticule grid — nautical chart feel */}
+        <g stroke={ink} strokeOpacity="0.05" strokeWidth="1">
+          {[60, 120, 180, 240, 300, 360, 420].map((y) => (
+            <line key={`h${y}`} x1="0" y1={y} x2="480" y2={y} />
+          ))}
+          {[60, 120, 180, 240, 300, 360, 420].map((x) => (
+            <line key={`v${x}`} x1={x} y1="0" x2={x} y2="420" />
+          ))}
+        </g>
+
+        {/* glow behind active destination */}
         <motion.circle
           key={`${activeKey}-glow`}
           cx={dest.x}
           cy={dest.y}
-          r="70"
+          r="64"
           fill="url(#map-glow)"
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
         />
 
-        {/* stylised Asia landmass (abstract, not geographically exact) */}
+        {/* China + East Asia mainland */}
         <path
-          d="M120 60 Q170 40 220 55 Q280 72 300 60 Q330 78 320 110 Q345 130 320 160 Q300 200 260 210 Q250 240 270 260 Q230 255 220 230 Q190 235 175 215 Q140 220 120 195 Q95 170 110 140 Q90 120 105 95 Q108 72 120 60 Z"
-          fill="url(#land)"
-          stroke="rgba(247,241,230,0.12)"
-          strokeWidth="1"
-        />
-        {/* a couple of islands for flavour */}
-        <path
-          d="M300 215 Q318 210 322 228 Q314 244 298 238 Q292 224 300 215 Z"
-          fill="url(#land)"
-          stroke="rgba(247,241,230,0.10)"
-          strokeWidth="1"
+          d="M150 96
+             C 180 74, 250 70, 312 84
+             C 348 92, 388 96, 410 120
+             C 420 134, 404 150, 416 166
+             C 410 188, 372 196, 360 214
+             L 352 232
+             C 344 226, 336 214, 330 222
+             C 300 214, 268 220, 250 206
+             C 224 210, 198 216, 178 202
+             C 150 196, 126 180, 120 152
+             C 112 132, 132 116, 124 100
+             C 126 92, 138 92, 150 96 Z"
+          fill={ink}
+          fillOpacity="0.07"
+          stroke={ink}
+          strokeOpacity="0.22"
+          strokeWidth="1.2"
         />
 
-        {/* flight path from origin to active destination */}
+        {/* Indochina peninsula (Thailand + Vietnam) */}
+        <path
+          d="M330 222
+             C 344 246, 338 272, 348 296
+             C 352 312, 344 330, 332 346
+             C 326 332, 326 314, 320 302
+             C 312 312, 300 326, 296 314
+             C 290 298, 300 282, 292 268
+             C 282 262, 276 248, 282 234
+             C 298 226, 314 222, 330 222 Z"
+          fill={ink}
+          fillOpacity="0.07"
+          stroke={ink}
+          strokeOpacity="0.22"
+          strokeWidth="1.2"
+        />
+
+        {/* island flecks (Hainan / archipelago) */}
+        <circle cx="372" cy="250" r="5" fill={ink} fillOpacity="0.08" stroke={ink} strokeOpacity="0.18" />
+        <circle cx="402" cy="300" r="3" fill={ink} fillOpacity="0.07" stroke={ink} strokeOpacity="0.16" />
+        <circle cx="416" cy="278" r="2.4" fill={ink} fillOpacity="0.07" stroke={ink} strokeOpacity="0.16" />
+
+        {/* flight path */}
         <motion.path
           key={`${activeKey}-path`}
           d={arc(origin, dest)}
           fill="none"
           stroke={active.accentSoft}
           strokeWidth="1.5"
-          strokeDasharray="4 5"
+          strokeDasharray="3 6"
           strokeLinecap="round"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: 0.8 }}
-          transition={{ duration: reduce ? 0.01 : 1, ease: "easeInOut" }}
+          animate={{ pathLength: 1, opacity: 0.85 }}
+          transition={{ duration: reduce ? 0.01 : 1.1, ease: "easeInOut" }}
         />
 
-        {/* flying plane marker — SMIL animateMotion re-runs on key change */}
+        {/* flying plane */}
         {!reduce && (
           <g key={`${activeKey}-plane`}>
-            <text fontSize="15" textAnchor="middle" opacity="0">
-              ✈️
+            <g opacity="0">
+              <path
+                d="M0 -5 L9 0 L0 5 L2 0 Z"
+                fill={ink}
+              />
               <animate
                 attributeName="opacity"
                 values="0;1;1;0"
-                keyTimes="0;0.15;0.85;1"
-                dur="1.2s"
-                begin="0s"
+                keyTimes="0;0.12;0.88;1"
+                dur="1.3s"
                 fill="freeze"
               />
               <animateMotion
-                dur="1.2s"
-                begin="0s"
+                dur="1.3s"
                 fill="freeze"
                 rotate="auto"
                 path={arc(origin, dest)}
+                calcMode="spline"
                 keyPoints="0;1"
                 keyTimes="0;1"
-                calcMode="spline"
                 keySplines="0.42 0 0.58 1"
               />
-            </text>
+            </g>
           </g>
         )}
 
-        {/* origin: Aarhus */}
+        {/* origin: Denmark */}
         <g>
-          <circle cx={origin.x} cy={origin.y} r="4" fill="#F7F1E6" />
+          <circle cx={origin.x} cy={origin.y} r="3.5" fill={ink} />
+          <circle cx={origin.x} cy={origin.y} r="7" fill="none" stroke={ink} strokeOpacity="0.4" />
           <text
-            x={origin.x}
-            y={origin.y - 12}
-            fill="rgba(247,241,230,0.7)"
+            x={origin.x + 12}
+            y={origin.y + 4}
+            fill={ink}
+            fillOpacity="0.7"
             fontSize="11"
-            textAnchor="middle"
             fontFamily="var(--font-sans)"
           >
             Aarhus
@@ -136,7 +174,7 @@ export function AsiaMap({
                   stroke={c.accentSoft}
                   strokeWidth="2"
                   initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ scale: [1, 2.6], opacity: [0.8, 0] }}
+                  animate={{ scale: [1, 2.8], opacity: [0.8, 0] }}
                   transition={{ duration: 1.8, repeat: Infinity, ease: "easeOut" }}
                   style={{ transformOrigin: `${c.mapPoint.x}px ${c.mapPoint.y}px` }}
                 />
@@ -144,21 +182,22 @@ export function AsiaMap({
               <circle
                 cx={c.mapPoint.x}
                 cy={c.mapPoint.y}
-                r={isActive ? 6 : 4}
-                fill={isActive ? c.accentSoft : "rgba(247,241,230,0.4)"}
-                stroke={isActive ? "#0B0A14" : "transparent"}
+                r={isActive ? 5.5 : 3.5}
+                fill={isActive ? c.accentSoft : "rgba(236,230,218,0.45)"}
+                stroke={isActive ? "#0B0B0C" : "transparent"}
                 strokeWidth="1.5"
               />
               <text
                 x={c.mapPoint.x}
                 y={c.mapPoint.y + 20}
-                fill={isActive ? c.accentSoft : "rgba(247,241,230,0.45)"}
-                fontSize="11"
+                fill={isActive ? ink : "rgba(236,230,218,0.5)"}
+                fontSize="10"
                 fontWeight={isActive ? 700 : 400}
                 textAnchor="middle"
                 fontFamily="var(--font-sans)"
+                style={{ letterSpacing: "0.08em" }}
               >
-                {c.flag}
+                {c.country.en.toUpperCase()}
               </text>
             </g>
           );
@@ -171,6 +210,6 @@ export function AsiaMap({
 /** quadratic arc path string between two points, bowed upward */
 function arc(a: { x: number; y: number }, b: { x: number; y: number }) {
   const mx = (a.x + b.x) / 2;
-  const my = (a.y + b.y) / 2 - 50;
+  const my = Math.min(a.y, b.y) - 70;
   return `M ${a.x} ${a.y} Q ${mx} ${my} ${b.x} ${b.y}`;
 }

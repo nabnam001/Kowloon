@@ -20,7 +20,7 @@ export function Drinks() {
   const [tab, setTab] = useState<"drinks" | "wine">("drinks");
 
   return (
-    <section className="relative py-20 sm:py-28">
+    <section id="drinks" className="relative scroll-mt-24 py-20 sm:py-28">
       <div className="container-x">
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="kicker justify-center">

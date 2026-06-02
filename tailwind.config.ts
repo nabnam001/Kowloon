@@ -9,28 +9,30 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Pulled from the original Kowloon logo.svg
+        // Sumi-e ink + washi paper + a single traditional hanko (seal) red.
+        // Yin-yang black & white with Scandinavian restraint.
         indigo: {
-          DEFAULT: "#2C2276",
-          deep: "#1A153F",
-          soft: "#3B318F",
+          DEFAULT: "#17171B",
+          deep: "#0A0A0C",
+          soft: "#26262C",
         },
         chilli: {
-          DEFAULT: "#DD2627",
-          dark: "#A81718",
-          glow: "#FF3B3C",
+          DEFAULT: "#B23A2E", // muted seal red
+          dark: "#8C2A20",
+          glow: "#C2453A",
         },
         gold: {
-          DEFAULT: "#E8B873",
-          soft: "#F2D6A8",
-          deep: "#C8923F",
+          DEFAULT: "#BCB2A0", // warm stone (elegant mono accent)
+          soft: "#D8D0C0",
+          deep: "#9A8F7B",
         },
         ink: {
-          DEFAULT: "#0B0A14",
-          800: "#13111F",
-          700: "#1C1930",
+          DEFAULT: "#0B0B0C",
+          800: "#131315",
+          700: "#1B1B1E",
+          deep: "#060607",
         },
-        cream: "#F7F1E6",
+        cream: "#ECE6DA", // washi / bone white
       },
       fontFamily: {
         display: ["var(--font-display)", "serif"],
@@ -68,7 +70,7 @@ const config: Config = {
       },
       backgroundImage: {
         "gold-shimmer":
-          "linear-gradient(110deg, transparent 30%, rgba(232,184,115,0.6) 50%, transparent 70%)",
+          "linear-gradient(110deg, transparent 30%, rgba(188,178,160,0.6) 50%, transparent 70%)",
       },
     },
   },
