@@ -93,6 +93,25 @@ export function Journey() {
       <InkBackdrop variant="soft" />
       {/* atmospheric smoke haze */}
       <SmokeOverlay opacity={0.12} />
+      {/* the active country's real silhouette, faint behind the scene */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`silhouette-${theme.key}`}
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 0.06, scale: 1 }}
+          exit={{ opacity: 0, scale: 1.05 }}
+          transition={{ duration: 0.8 }}
+          className="pointer-events-none absolute left-1/2 top-1/2 -z-[6] h-[80%] w-[70%] -translate-x-1/2 -translate-y-1/2"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={theme.mapSvg}
+            alt=""
+            aria-hidden
+            className="h-full w-full object-contain [filter:brightness(0)_invert(1)]"
+          />
+        </motion.div>
+      </AnimatePresence>
       {/* drifting cultural motifs */}
       <Motifs themeKey={theme.key} accent={theme.accentSoft} />
       {/* per-destination ambient particles */}

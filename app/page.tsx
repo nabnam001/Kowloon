@@ -11,7 +11,6 @@ import { Deals } from "@/components/Deals";
 import { DishMarquee } from "@/components/DishMarquee";
 import { KineticRibbon } from "@/components/KineticRibbon";
 import { About } from "@/components/About";
-import { Drinks } from "@/components/Drinks";
 import { Locations } from "@/components/Locations";
 import { Contact } from "@/components/Contact";
 import { Footer } from "@/components/Footer";
@@ -34,7 +33,6 @@ export default function Home() {
         <DishMarquee />
         <About />
         <KineticRibbon />
-        <Drinks />
         <Locations />
         <Contact />
       </main>

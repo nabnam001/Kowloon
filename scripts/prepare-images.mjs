@@ -161,6 +161,11 @@ const brandMap = {
   "chilli2.png": "chilli2-removebg-preview.png",
   "chilli3.png": "chilli3-removebg-preview.png",
   "elite-smiley.png": "EliteSmiley.png",
+  "map-denmark.svg": "banegaardsgade/denmark.svg",
+  "map-china.svg": "banegaardsgade/china.svg",
+  "map-thailand.svg": "banegaardsgade/thailand.svg",
+  "map-vietnam.svg": "banegaardsgade/vietnam.svg",
+  "wave.avif": "banegaardsgade/583b34ac-b7a9-4144-b588-e1a27854f98c.png.avif",
 };
 
 // Real interior / ambiance photography (newly provided).

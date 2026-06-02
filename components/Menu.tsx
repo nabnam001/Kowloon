@@ -10,6 +10,7 @@ import {
   type Dish,
   type LocationId,
 } from "@/data/menu";
+import { drinks, wines, houseWine } from "@/data/drinks";
 import { locations } from "@/data/site";
 import { useLang } from "./LangProvider";
 import { Reveal } from "./Reveal";
@@ -48,6 +49,10 @@ export function Menu() {
   const [selected, setSelected] = useState<Dish | null>(null);
 
   const shopDishes = useMemo(() => dishesAt(loc), [loc]);
+  const currentLoc = useMemo(
+    () => locations.find((l) => l.id === (loc as string)),
+    [loc]
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -275,16 +280,113 @@ export function Menu() {
               </div>
             ))}
 
-            {/* Drinks & wine pointer */}
-            <div className="flex flex-col items-center gap-3 border-t border-cream/10 pt-10 text-center">
-              <p className="text-sm text-cream/50">{t.menu.drinksHint}</p>
-              <a href="#drinks" className="btn-ghost text-sm">
-                {t.drinks.tabDrinks} & {t.drinks.tabWine}
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </a>
-            </div>
+            {/* Drinks section */}
+            {(diet === "all") && !query && (
+              <div className="mb-14 scroll-mt-32">
+                <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
+                  <div className="flex items-baseline gap-3">
+                    <h3 className="heading-display text-2xl text-cream sm:text-3xl">
+                      {t.drinks.tabDrinks}
+                    </h3>
+                    <span className="font-display text-lg text-cream/35">飲み物</span>
+                  </div>
+                </div>
+                <ul className="divide-y divide-cream/[0.06]">
+                  {drinks.map((d) => (
+                    <li key={d.name} className="flex items-center gap-4 py-4 sm:gap-5 sm:px-3">
+                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-ink-700 sm:h-20 sm:w-20">
+                        {d.img && (
+                          <Image
+                            src={`/images/drinks/${d.img}.png`}
+                            alt={d.name}
+                            fill
+                            sizes="80px"
+                            className="object-contain p-1.5"
+                          />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <h4 className="font-display text-base font-semibold text-cream">
+                            {d.name}
+                          </h4>
+                          {d.price && (
+                            <span className="shrink-0 font-display text-lg font-bold text-gold">
+                              {d.price},-
+                            </span>
+                          )}
+                        </div>
+                        {d.options && (
+                          <p className="mt-1 text-sm text-cream/55">
+                            {d.options.join(" · ")}
+                          </p>
+                        )}
+                        {d.lines && (
+                          <ul className="mt-1 space-y-0.5">
+                            {d.lines.map((l) => (
+                              <li key={l.label} className="flex justify-between text-sm text-cream/55">
+                                <span>{l.label}</span>
+                                <span className="text-cream/80">{l.price},-</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Wine section — Frederiksgade only */}
+            {currentLoc?.hasWine && diet === "all" && !query && (
+              <div className="mb-14 scroll-mt-32">
+                <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
+                  <div className="flex items-baseline gap-3">
+                    <h3 className="heading-display text-2xl text-cream sm:text-3xl">
+                      {t.drinks.tabWine}
+                    </h3>
+                    <span className="font-display text-lg text-cream/35">ワイン</span>
+                  </div>
+                  <span className="text-xs uppercase tracking-widest text-cream/35">
+                    {wines.length + 1}
+                  </span>
+                </div>
+                <ul className="divide-y divide-cream/[0.06]">
+                  {[houseWine, ...wines].map((w) => (
+                    <li key={w.id} className="flex items-center gap-4 py-4 sm:gap-5 sm:px-3">
+                      <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg bg-ink-700 sm:h-20 sm:w-14">
+                        {w.img ? (
+                          <Image
+                            src={`/images/wine/${w.img}.${w.ext ?? "png"}`}
+                            alt={w.name}
+                            fill
+                            sizes="56px"
+                            className="object-contain p-1"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xl">🍷</div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <h4 className="font-display text-base font-semibold text-cream">
+                            {w.name}
+                          </h4>
+                          <span className="shrink-0 font-display text-lg font-bold text-gold">
+                            {w.price},-
+                          </span>
+                        </div>
+                        <p className="mt-0.5 text-xs uppercase tracking-wide text-chilli/80">
+                          {w.type}
+                        </p>
+                        <p className="mt-1 line-clamp-2 text-sm text-cream/55">{w.desc}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </motion.div>
         </AnimatePresence>
 

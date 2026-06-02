@@ -19,6 +19,8 @@ export interface CuisineTheme {
   bg: string;
   /** position of the destination on the stylised Asia map (viewBox 0 0 400 300) */
   mapPoint: { x: number; y: number };
+  /** real country silhouette SVG (under /brand) */
+  mapSvg: string;
   /** curated, photogenic signature dish ids (must have images) */
   signatures: string[];
 }
@@ -42,6 +44,7 @@ export const cuisineThemes: CuisineTheme[] = [
     glow: "rgba(178,58,46,0.30)",
     bg: "radial-gradient(ellipse at 30% 18%, rgba(236,230,218,0.05), transparent 55%), radial-gradient(ellipse at 80% 85%, rgba(178,58,46,0.12), transparent 55%), linear-gradient(160deg, #121214 0%, #0B0B0C 60%, #060607 100%)",
     mapPoint: { x: 300, y: 150 },
+    mapSvg: "/brand/map-china.svg",
     signatures: ["21", "22", "19", "13", "5", "6", "15", "12"],
   },
   {
@@ -62,6 +65,7 @@ export const cuisineThemes: CuisineTheme[] = [
     glow: "rgba(178,58,46,0.26)",
     bg: "radial-gradient(ellipse at 25% 22%, rgba(236,230,218,0.06), transparent 55%), radial-gradient(ellipse at 82% 80%, rgba(178,58,46,0.10), transparent 55%), linear-gradient(160deg, #131314 0%, #0B0B0C 58%, #060607 100%)",
     mapPoint: { x: 300, y: 286 },
+    mapSvg: "/brand/map-thailand.svg",
     signatures: ["47", "46", "32", "37", "59", "60", "62", "42"],
   },
   {
@@ -82,6 +86,7 @@ export const cuisineThemes: CuisineTheme[] = [
     glow: "rgba(178,58,46,0.28)",
     bg: "radial-gradient(ellipse at 30% 20%, rgba(236,230,218,0.05), transparent 55%), radial-gradient(ellipse at 78% 82%, rgba(178,58,46,0.11), transparent 55%), linear-gradient(160deg, #121213 0%, #0B0B0C 60%, #060607 100%)",
     mapPoint: { x: 342, y: 300 },
+    mapSvg: "/brand/map-vietnam.svg",
     signatures: ["34", "74", "89", "81", "87", "82", "36", "29"],
   },
 ];

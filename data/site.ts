@@ -9,15 +9,69 @@ export interface Location {
   city: string;
   phone: string;
   phoneHref: string;
+  email: string;
+  facebook: string;
+  eliteSmiley: string;
+  cvr: string;
   mapsUrl: string;
   pageUrl: string;
   blurb: { da: string; en: string };
+  /** has its own wine list */
+  hasWine: boolean;
+  /** opening hours rows, localized */
+  hours: {
+    da: { day: string; value: string; closed?: boolean }[];
+    en: { day: string; value: string; closed?: boolean }[];
+  };
+  hoursNote: { da: string; en: string };
   /** signature traits shown as a comparison */
   features: { da: string; en: string; has: boolean }[];
   /** headline stats */
   stats: { value: string; label: { da: string; en: string } }[];
   photo: string;
 }
+
+const fredHours = {
+  da: [
+    { day: "Mandag", value: "Lukket", closed: true },
+    { day: "Tirsdag", value: "12 – 21" },
+    { day: "Onsdag", value: "12 – 21" },
+    { day: "Torsdag", value: "12 – 21" },
+    { day: "Fredag", value: "12 – 21" },
+    { day: "Lørdag", value: "12 – 21" },
+    { day: "Søndag", value: "12 – 21" },
+  ],
+  en: [
+    { day: "Monday", value: "Closed", closed: true },
+    { day: "Tuesday", value: "12 – 21" },
+    { day: "Wednesday", value: "12 – 21" },
+    { day: "Thursday", value: "12 – 21" },
+    { day: "Friday", value: "12 – 21" },
+    { day: "Saturday", value: "12 – 21" },
+    { day: "Sunday", value: "12 – 21" },
+  ],
+};
+
+const baneHours = {
+  da: [
+    { day: "Mandag", value: "12 – 20" },
+    { day: "Tirsdag", value: "Lukket", closed: true },
+    { day: "Onsdag", value: "12 – 20" },
+    { day: "Torsdag", value: "12 – 20" },
+    { day: "Fredag", value: "12 – 20" },
+    { day: "Lørdag", value: "12 – 20" },
+    { day: "Søndag", value: "12 – 20" },
+  ],
+  en: [
+    { day: "Monday", value: "12 – 20" },
+    { day: "Tuesday", value: "Closed", closed: true },
+    { day: "Wednesday", value: "12 – 20" },
+    { day: "Thursday", value: "12 – 20" },
+    { day: "Friday", value: "12 – 20" },
+    { day: "Saturday", value: "12 – 20" },
+    { day: "Sunday", value: "12 – 20" },
+  ],
+};
 
 export const locations: Location[] = [
   {
@@ -31,11 +85,21 @@ export const locations: Location[] = [
     city: "8000 Aarhus C",
     phone: "86 19 19 98",
     phoneHref: "tel:+4586191998",
+    email: "Mail@kowloon.dk",
+    facebook: "https://www.facebook.com/KowloonAarhus/",
+    eliteSmiley: "https://www.findsmiley.dk/508461",
+    cvr: "21 65 98 94",
     mapsUrl: "https://maps.google.com/?q=Restaurant+Kowloon+Frederiksgade+78+Aarhus",
     pageUrl: "https://www.kowloon.dk/frederiksgade/frederiksgade.html",
     blurb: {
       da: "Vores flagskib nær Rema1000 og Karma Sushi. Sæt dig til rette i den livlige stemning — eller fyld en take-away box fra buffeten.",
       en: "Our flagship near Rema1000 and Karma Sushi. Settle into the lively atmosphere — or fill a take-away box from the buffet.",
+    },
+    hasWine: true,
+    hours: fredHours,
+    hoursNote: {
+      da: "Køkkenet lukker kl. 20.30 · Thaiboks kl. 20.00",
+      en: "Kitchen closes 20.30 · Thai-box 20.00",
     },
     features: [
       { da: "70 siddepladser", en: "70 seats", has: true },
@@ -62,18 +126,28 @@ export const locations: Location[] = [
     city: "8000 Aarhus C",
     phone: "86 19 42 11",
     phoneHref: "tel:+4586194211",
+    email: "Kowloonaarhus@gmail.com",
+    facebook: "https://www.facebook.com/KowloonAarhus.Banegaardsgade/",
+    eliteSmiley: "https://www.findsmiley.dk/43656",
+    cvr: "26 39 42 01",
     mapsUrl: "https://maps.google.com/?q=Kowloon+Banegaardsgade+33+Aarhus",
     pageUrl: "https://www.kowloon.dk/banegaardsgade/banegaardsgade.html",
     blurb: {
       da: "Nær Burger King og banegården. Et lille, intimt sted — perfekt til en hurtig asiatisk smagsoplevelse på farten.",
       en: "Near Burger King and the station. A small, intimate spot — perfect for a quick Asian taste experience on the go.",
     },
+    hasWine: false,
+    hours: baneHours,
+    hoursNote: {
+      da: "Køkkenet lukker kl. 20.00",
+      en: "Kitchen closes 20.00",
+    },
     features: [
       { da: "Intim størrelse", en: "Intimate size", has: true },
       { da: "Take-away & på farten", en: "Take-away & on the go", has: true },
-      { da: "Klassiske favoritter", en: "Classic favourites", has: true },
+      { da: "Samme à la carte køkken", en: "Same à la carte kitchen", has: true },
       { da: "Tæt på banegården", en: "Next to the station", has: true },
-      { da: "Stor restaurant-buffet", en: "Large dine-in buffet", has: false },
+      { da: "Vinkort", en: "Wine list", has: false },
     ],
     stats: [
       { value: "2 min", label: { da: "fra banegård", en: "from station" } },

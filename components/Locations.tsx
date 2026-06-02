@@ -9,6 +9,20 @@ import { locations } from "@/data/site";
 export function Locations() {
   const { t, lang } = useLang();
 
+  // interior photo strips per shop (from the real venue photography)
+  const galleries: Record<string, string[]> = {
+    frederiksgade: [
+      "/images/venue/interior-1.jpg",
+      "/images/venue/interior-2.jpg",
+      "/images/venue/interior-3.jpg",
+    ],
+    banegaardsgade: [
+      "/images/venue/banegaardsgade-interior-1.jpg",
+      "/images/venue/banegaardsgade-interior-2.jpg",
+      "/images/venue/banegaardsgade-dishes.jpg",
+    ],
+  };
+
   return (
     <section
       id="locations"
@@ -84,6 +98,24 @@ export function Locations() {
                     </div>
                     <p className="mt-4 text-cream/70">{loc.blurb[lang]}</p>
 
+                    {/* interior photo strip */}
+                    <div className="mt-5 grid grid-cols-3 gap-2">
+                      {galleries[loc.id].map((src, gi) => (
+                        <div
+                          key={src}
+                          className="relative aspect-[4/3] overflow-hidden rounded-lg"
+                        >
+                          <Image
+                            src={src}
+                            alt={`${loc.name} ${gi + 1}`}
+                            fill
+                            sizes="(max-width: 1024px) 33vw, 16vw"
+                            className="object-cover transition-transform duration-700 hover:scale-110"
+                          />
+                        </div>
+                      ))}
+                    </div>
+
                     {/* Feature checklist */}
                     <ul className="mt-6 grid gap-2">
                       {loc.features.map((f, fi) => (
@@ -104,6 +136,66 @@ export function Locations() {
                         </motion.li>
                       ))}
                     </ul>
+
+                    {/* hours + contact */}
+                    <div className="mt-6 grid gap-4 border-t border-cream/10 pt-5 sm:grid-cols-2">
+                      <div>
+                        <h4 className="text-xs font-semibold uppercase tracking-widest text-gold">
+                          {t.contact.hours}
+                        </h4>
+                        <ul className="mt-2 space-y-0.5 text-xs text-cream/70">
+                          {loc.hours[lang].map((h) => (
+                            <li key={h.day} className="flex justify-between gap-3">
+                              <span>{h.day}</span>
+                              <span className={h.closed ? "text-chilli-glow" : ""}>
+                                {h.value}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="mt-2 text-[11px] text-cream/45">
+                          {loc.hoursNote[lang]}
+                        </p>
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-semibold uppercase tracking-widest text-gold">
+                          {t.contact.reach}
+                        </h4>
+                        <dl className="mt-2 space-y-1.5 text-xs text-cream/70">
+                          <div>
+                            <a href={loc.phoneHref} className="transition-colors hover:text-gold">
+                              {loc.phone}
+                            </a>
+                          </div>
+                          <div>
+                            <a
+                              href={`mailto:${loc.email}`}
+                              className="break-all transition-colors hover:text-gold"
+                            >
+                              {loc.email}
+                            </a>
+                          </div>
+                          <div className="flex gap-3 pt-1">
+                            <a
+                              href={loc.facebook}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="transition-colors hover:text-gold"
+                            >
+                              Facebook
+                            </a>
+                            <a
+                              href={loc.eliteSmiley}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="transition-colors hover:text-gold"
+                            >
+                              Elite Smiley
+                            </a>
+                          </div>
+                        </dl>
+                      </div>
+                    </div>
 
                     <div className="mt-7 flex flex-wrap items-center gap-3">
                       <a href={loc.phoneHref} className="btn-primary text-sm">

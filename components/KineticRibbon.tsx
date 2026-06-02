@@ -19,10 +19,15 @@ export function KineticRibbon() {
   return (
     <section
       aria-hidden="true"
-      className="relative overflow-hidden border-y border-white/5 bg-gradient-to-b from-ink via-indigo-deep/30 to-ink py-8 sm:py-12"
+      className="relative overflow-hidden border-y border-white/5 bg-ink py-8 sm:py-12"
     >
+      {/* asian wave texture backdrop */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.10] mix-blend-screen"
+        style={{ backgroundImage: "url(/brand/wave.avif)" }}
+      />
       <motion.div
-        className="flex w-max items-center gap-8 whitespace-nowrap will-change-transform"
+        className="relative flex w-max items-center gap-8 whitespace-nowrap will-change-transform"
         animate={reduce ? undefined : { x: ["0%", "-50%"] }}
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
       >
@@ -32,7 +37,7 @@ export function KineticRibbon() {
               className={
                 i % 2 === 0
                   ? "font-display text-5xl font-bold tracking-tight text-cream sm:text-7xl"
-                  : "font-display text-5xl font-bold tracking-tight text-transparent sm:text-7xl [-webkit-text-stroke:1px_rgba(232,184,115,0.7)]"
+                  : "font-display text-5xl font-bold tracking-tight text-transparent sm:text-7xl [-webkit-text-stroke:1px_rgba(188,178,160,0.7)]"
               }
             >
               {word}
