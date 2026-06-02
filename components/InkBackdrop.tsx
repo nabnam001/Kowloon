@@ -35,19 +35,30 @@ export function InkBackdrop({
         transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      {/* coiling dragon (very faint, ink line) */}
+      {/* flowing cloud / wave motif (seigaiha-inspired), faint ink */}
       <svg
-        className="absolute -right-10 top-1/4 hidden w-[640px] opacity-[0.06] lg:block"
-        viewBox="0 0 600 400"
+        className="absolute -right-8 top-[22%] hidden w-[460px] opacity-[0.06] lg:block"
+        viewBox="0 0 400 200"
         fill="none"
         stroke="#ECE6DA"
-        strokeWidth="2"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       >
-        <path d="M40 220 C120 120 220 320 320 200 C400 110 470 180 540 120 C500 170 520 230 470 250 C520 250 540 290 500 320 C470 300 440 320 420 300 C440 340 400 360 370 340 C390 300 350 280 330 300 C300 250 250 270 230 240 C180 280 120 260 100 300 C120 250 80 240 40 220 Z" />
-        {/* spine accents */}
-        <path d="M320 200 l8 -22 M360 196 l10 -20 M400 186 l10 -20 M440 172 l10 -20" strokeWidth="1.5" />
-        {/* eye */}
-        <circle cx="528" cy="128" r="3" fill="#ECE6DA" stroke="none" />
+        <path d="M10 120 Q40 80 70 120 T130 120 T190 120 T250 120 T310 120 T370 120" />
+        <path d="M10 150 Q40 110 70 150 T130 150 T190 150 T250 150 T310 150 T370 150" opacity="0.7" />
+        <path d="M40 90 Q70 50 100 90 T160 90 T220 90 T280 90 T340 90" opacity="0.5" />
+      </svg>
+
+      {/* enso (zen circle) — single calligraphic brush ring */}
+      <svg
+        className="absolute left-[6%] top-[30%] hidden w-44 opacity-[0.05] lg:block"
+        viewBox="0 0 120 120"
+        fill="none"
+        stroke="#ECE6DA"
+        strokeWidth="6"
+        strokeLinecap="round"
+      >
+        <path d="M88 30 A44 44 0 1 0 96 70" />
       </svg>
 
       {/* distant mountain ridge */}
