@@ -23,7 +23,10 @@ export function LangProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const saved = (typeof window !== "undefined" &&
       window.localStorage.getItem("kowloon-lang")) as Lang | null;
-    if (saved === "da" || saved === "en") setLangState(saved);
+    if (saved === "da" || saved === "en") {
+      setLangState(saved);
+      document.documentElement.lang = saved;
+    }
   }, []);
 
   const setLang = (l: Lang) => {

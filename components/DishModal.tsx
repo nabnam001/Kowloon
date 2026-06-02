@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import type { Dish } from "@/data/menu";
 import { CUISINE_LABELS } from "@/data/menu";
 import { useLang } from "./LangProvider";
@@ -16,12 +16,20 @@ export function DishModal({
   onClose: () => void;
 }) {
   const { t, lang } = useLang();
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     if (dish) {
       document.addEventListener("keydown", onKey);
       document.body.style.overflow = "hidden";
+      // Move focus into the dialog for keyboard/screen-reader users
+      const id = window.setTimeout(() => closeRef.current?.focus(), 50);
+      return () => {
+        document.removeEventListener("keydown", onKey);
+        document.body.style.overflow = "";
+        window.clearTimeout(id);
+      };
     }
     return () => {
       document.removeEventListener("keydown", onKey);
@@ -75,9 +83,10 @@ export function DishModal({
                 )}
               </div>
               <button
+                ref={closeRef}
                 onClick={onClose}
-                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-ink/60 text-cream backdrop-blur transition-colors hover:bg-ink"
-                aria-label="Luk"
+                className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-ink/60 text-cream backdrop-blur transition-colors hover:bg-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+                aria-label={t.menu.close}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path

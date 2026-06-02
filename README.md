@@ -19,8 +19,9 @@ No backend. Everything is a static export, so it deploys anywhere (Vercel, Netli
 - Drinks & wine browser (tabbed), including the full 201–212 wine list
 - Two-location section with real photos, click-to-call, and map links
 - Opening hours that highlight today, plus contact + Facebook
-- Danish 🇩🇰 / English 🇬🇧 language toggle (persists in localStorage)
-- Fully responsive, accessible (keyboard, focus rings, reduced-motion support), SEO + JSON-LD structured data
+- Danish 🇩🇰 / English 🇬🇧 language toggle (persists in localStorage, updates `<html lang>`)
+- Fully responsive, WCAG-minded accessibility: visible focus rings on every control, skip link, `aria-pressed`/`aria-current`/`aria-live`, modal focus management, and full `prefers-reduced-motion` support that disables parallax and looping animations
+- SEO + JSON-LD structured data, generated Open Graph share image, web manifest, branded SVG favicon
 
 ## Getting started
 

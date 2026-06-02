@@ -39,6 +39,7 @@ export function Deals() {
             <DealCard
               title={t.deals.three}
               price={pricing.menu3}
+              popular={t.deals.popular}
               icons={["forret", "hovedret", "dessert"]}
               labels={[
                 t.deals.single.forret,
@@ -57,7 +58,7 @@ export function Deals() {
             <Pill label={t.deals.single.hovedret} price={pricing.hovedret} />
             <Pill label={t.deals.single.dessert} price={pricing.dessert} />
           </div>
-          <p className="mt-4 text-center text-xs text-cream/40">
+          <p className="mt-4 text-center text-xs text-cream/60">
             {pricing.menuNote}
           </p>
         </Reveal>
@@ -115,12 +116,14 @@ function DealCard({
   icons,
   labels,
   featured,
+  popular,
 }: {
   title: string;
   price: number;
   icons: string[];
   labels: string[];
   featured?: boolean;
+  popular?: string;
 }) {
   return (
     <div
@@ -130,9 +133,9 @@ function DealCard({
           : "glass"
       }`}
     >
-      {featured && (
+      {featured && popular && (
         <span className="absolute right-5 top-5 rounded-full bg-gold px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-ink">
-          Populær
+          {popular}
         </span>
       )}
       <h3 className="font-display text-2xl font-semibold text-cream">{title}</h3>

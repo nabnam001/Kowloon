@@ -5,11 +5,13 @@ import { Reveal } from "./Reveal";
 import { contact, hours } from "@/data/site";
 
 export function Contact() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   // Highlight today's row (0 = Sunday in JS)
   const jsDay = new Date().getDay();
   const todayIndex = jsDay === 0 ? 6 : jsDay - 1; // map to Mon..Sun order
+  const hoursRows = hours[lang];
+  const hoursNotes = hours.notes[lang];
 
   return (
     <section id="contact" className="relative scroll-mt-24 py-20 sm:py-28">
@@ -33,7 +35,7 @@ export function Contact() {
                 {t.contact.hours}
               </h3>
               <ul className="mt-5 space-y-1">
-                {hours.da.map((h, i) => (
+                {hoursRows.map((h, i) => (
                   <li
                     key={h.day}
                     className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors ${
@@ -49,8 +51,8 @@ export function Contact() {
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 space-y-1 border-t border-white/10 pt-4 text-xs text-cream/50">
-                {hours.notes.da.map((n) => (
+              <div className="mt-4 space-y-1 border-t border-white/10 pt-4 text-xs text-cream/60">
+                {hoursNotes.map((n) => (
                   <p key={n}>• {n}</p>
                 ))}
               </div>
@@ -99,7 +101,7 @@ export function Contact() {
                     >
                       {contact.email}
                     </a>
-                    <p className="mt-0.5 text-xs text-cream/40">
+                    <p className="mt-0.5 text-xs text-cream/60">
                       {contact.emailNote}
                     </p>
                   </dd>

@@ -16,7 +16,7 @@ const wineTypeColor: Record<Wine["type"], string> = {
 };
 
 export function Drinks() {
-  const { lang } = useLang();
+  const { t } = useLang();
   const [tab, setTab] = useState<"drinks" | "wine">("drinks");
 
   return (
@@ -25,11 +25,11 @@ export function Drinks() {
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="kicker justify-center">
             <span className="h-px w-8 bg-gold" />
-            {lang === "da" ? "Drikkevarer & vin" : "Drinks & wine"}
+            {t.drinks.kicker}
             <span className="h-px w-8 bg-gold" />
           </span>
           <h2 className="heading-display mt-4 text-3xl text-cream sm:text-4xl">
-            {lang === "da" ? "Til at skylle ned med" : "Something to drink"}
+            {t.drinks.title}
           </h2>
         </Reveal>
 
@@ -40,8 +40,9 @@ export function Drinks() {
               <button
                 key={tb}
                 onClick={() => setTab(tb)}
-                className={`relative rounded-full px-6 py-2 text-sm font-semibold transition-colors ${
-                  tab === tb ? "text-ink" : "text-cream/60 hover:text-cream"
+                aria-pressed={tab === tb}
+                className={`relative rounded-full px-6 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink ${
+                  tab === tb ? "text-ink" : "text-cream/70 hover:text-cream"
                 }`}
               >
                 {tab === tb && (
@@ -52,11 +53,7 @@ export function Drinks() {
                   />
                 )}
                 <span className="relative">
-                  {tb === "drinks"
-                    ? lang === "da"
-                      ? "Drikkevarer"
-                      : "Drinks"
-                    : "Vin"}
+                  {tb === "drinks" ? t.drinks.tabDrinks : t.drinks.tabWine}
                 </span>
               </button>
             ))}

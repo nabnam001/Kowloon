@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { useLang } from "./LangProvider";
 
 export function Hero() {
   const { t } = useLang();
+  const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -25,7 +26,7 @@ export function Hero() {
       className="relative grain flex min-h-[100svh] items-center overflow-hidden"
     >
       {/* Background gradient — Hong Kong night */}
-      <motion.div style={{ y: yBg }} className="absolute inset-0 -z-20">
+      <motion.div style={{ y: reduce ? 0 : yBg }} className="absolute inset-0 -z-20">
         <div className="absolute inset-0 bg-gradient-to-b from-ink-deep via-indigo-deep to-ink" />
         {/* Real restaurant interior, dimmed for cinematic depth */}
         <Image
@@ -42,15 +43,15 @@ export function Hero() {
       </motion.div>
 
       {/* Floating lantern glows */}
-      <Lanterns />
+      <Lanterns reduce={!!reduce} />
 
       {/* Floating signature dish */}
       <motion.div
-        style={{ y: dishY }}
+        style={{ y: reduce ? 0 : dishY }}
         className="pointer-events-none absolute right-[-6%] top-1/2 -z-10 hidden -translate-y-1/2 lg:block"
       >
         <motion.div
-          animate={{ y: [0, -18, 0] }}
+          animate={reduce ? undefined : { y: [0, -18, 0] }}
           transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
           className="relative h-[34rem] w-[34rem]"
         >
@@ -66,7 +67,7 @@ export function Hero() {
       </motion.div>
 
       <motion.div
-        style={{ y: yText, opacity }}
+        style={{ y: reduce ? 0 : yText, opacity }}
         className="container-x relative z-10 pt-24"
       >
         <div className="max-w-2xl">
@@ -140,7 +141,7 @@ export function Hero() {
             {t.hero.scroll}
           </span>
           <motion.span
-            animate={{ y: [0, 8, 0] }}
+            animate={reduce ? undefined : { y: [0, 8, 0] }}
             transition={{ duration: 1.6, repeat: Infinity }}
             className="flex h-9 w-5 items-start justify-center rounded-full border border-cream/30 p-1"
           >
@@ -155,7 +156,7 @@ export function Hero() {
   );
 }
 
-function Lanterns() {
+function Lanterns({ reduce }: { reduce: boolean }) {
   const lanterns = [
     { left: "8%", top: "18%", size: 90, delay: 0 },
     { left: "22%", top: "60%", size: 60, delay: 1.5 },
@@ -164,13 +165,13 @@ function Lanterns() {
     { left: "45%", top: "12%", size: 50, delay: 1.1 },
   ];
   return (
-    <div className="pointer-events-none absolute inset-0 -z-10">
+    <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
       {lanterns.map((l, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full bg-chilli/30 blur-2xl"
           style={{ left: l.left, top: l.top, width: l.size, height: l.size }}
-          animate={{ opacity: [0.3, 0.7, 0.3], y: [0, -20, 0] }}
+          animate={reduce ? { opacity: 0.4 } : { opacity: [0.3, 0.7, 0.3], y: [0, -20, 0] }}
           transition={{
             duration: 6 + i,
             repeat: Infinity,

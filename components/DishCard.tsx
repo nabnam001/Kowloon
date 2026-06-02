@@ -22,7 +22,8 @@ export function DishCard({
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.4 }}
       onClick={() => onOpen(dish)}
-      className="group relative flex flex-col overflow-hidden rounded-3xl glass text-left transition-all duration-500 hover:-translate-y-1.5 hover:border-gold/30 hover:shadow-xl hover:shadow-chilli/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+      aria-label={`${dish.name} — ${dish.price} kr. ${t.menu.details}`}
+      className="group relative flex flex-col overflow-hidden rounded-3xl glass text-left transition-all duration-500 hover:-translate-y-1.5 hover:border-gold/30 hover:shadow-xl hover:shadow-chilli/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-indigo-deep/60 to-ink">
         {dish.hasImage ? (
@@ -82,9 +83,15 @@ export function DishCard({
         )}
         <div className="mt-auto flex items-center justify-between pt-2">
           <SpiceMeter level={dish.spice ?? 0} />
-          <span className="flex items-center gap-1 text-xs font-medium text-gold/0 transition-colors group-hover:text-gold">
-            Detaljer
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <span className="flex items-center gap-1 text-xs font-medium text-gold/70 transition-colors group-hover:text-gold">
+            {t.menu.details}
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              className="transition-transform duration-300 group-hover:translate-x-0.5"
+            >
               <path
                 d="M5 12h14m0 0-6-6m6 6-6 6"
                 stroke="currentColor"

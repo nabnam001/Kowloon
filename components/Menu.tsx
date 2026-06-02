@@ -85,7 +85,8 @@ export function Menu() {
                   <button
                     key={c}
                     onClick={() => setCuisine(c)}
-                    className={`relative whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                    aria-pressed={isActive}
+                    className={`relative whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink ${
                       isActive
                         ? "text-ink"
                         : "text-cream/70 hover:text-cream"
@@ -111,10 +112,11 @@ export function Menu() {
                   <button
                     key={chip.id}
                     onClick={() => setDiet(chip.id)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
+                    aria-pressed={diet === chip.id}
+                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink ${
                       diet === chip.id
                         ? "bg-chilli text-white"
-                        : "bg-white/5 text-cream/60 hover:bg-white/10 hover:text-cream"
+                        : "bg-white/5 text-cream/70 hover:bg-white/10 hover:text-cream"
                     }`}
                   >
                     {chip.label}
@@ -151,7 +153,7 @@ export function Menu() {
         </div>
 
         {/* Count */}
-        <p className="mt-6 text-center text-sm text-cream/40">
+        <p className="mt-6 text-center text-sm text-cream/60" aria-live="polite">
           {t.menu.count(filtered.length)}
         </p>
 

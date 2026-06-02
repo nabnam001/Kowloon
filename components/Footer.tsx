@@ -45,7 +45,7 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-xs text-cream/40 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-white/5 pt-6 text-xs text-cream/60 sm:flex-row">
           <p>
             © {year} Kowloon · CVR: {contact.cvr}
           </p>

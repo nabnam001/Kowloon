@@ -41,6 +41,9 @@ export function Navbar() {
 
   return (
     <>
+      <a href="#menu" className="skip-link">
+        {t.common.skip}
+      </a>
       <motion.header
         initial={{ y: -100 }}
         animate={{ y: 0 }}
@@ -54,8 +57,8 @@ export function Navbar() {
         <nav className="container-x flex items-center justify-between">
           <a
             href="#home"
-            className="relative z-10 flex items-center gap-3"
-            aria-label="Kowloon — forside"
+            className="relative z-10 flex items-center gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+            aria-label={t.common.home}
           >
             <Image
               src="/brand/logo.svg"
@@ -73,7 +76,8 @@ export function Navbar() {
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  className={`relative rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  aria-current={active === item.id ? "true" : undefined}
+                  className={`relative rounded-full px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink ${
                     active === item.id
                       ? "text-gold"
                       : "text-cream/70 hover:text-cream"
@@ -92,17 +96,17 @@ export function Navbar() {
           </ul>
 
           <div className="flex items-center gap-3">
-            <LangToggle lang={lang} setLang={setLang} />
+            <LangToggle lang={lang} setLang={setLang} t={t} />
             <a href="#locations" className="btn-primary hidden sm:inline-flex">
               {t.hero.ctaBook}
             </a>
             <button
               onClick={() => setOpen((o) => !o)}
-              className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full glass lg:hidden"
-              aria-label="Menu"
+              className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full glass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink lg:hidden"
+              aria-label={open ? t.common.closeMenu : t.common.openMenu}
               aria-expanded={open}
             >
-              <span className="sr-only">Menu</span>
+              <span className="sr-only">{open ? t.common.closeMenu : t.common.openMenu}</span>
               <div className="flex flex-col gap-1.5">
                 <motion.span
                   animate={open ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
@@ -177,9 +181,11 @@ export function Navbar() {
 function LangToggle({
   lang,
   setLang,
+  t,
 }: {
   lang: Lang;
   setLang: (l: Lang) => void;
+  t: ReturnType<typeof useLang>["t"];
 }) {
   return (
     <div className="flex items-center rounded-full glass p-0.5 text-xs font-semibold">
@@ -187,10 +193,11 @@ function LangToggle({
         <button
           key={l}
           onClick={() => setLang(l)}
-          className={`relative rounded-full px-3 py-1.5 uppercase transition-colors ${
+          className={`relative rounded-full px-3 py-1.5 uppercase transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink ${
             lang === l ? "text-ink" : "text-cream/60 hover:text-cream"
           }`}
           aria-pressed={lang === l}
+          aria-label={l === "da" ? t.common.languageDa : t.common.languageEn}
         >
           {lang === l && (
             <motion.span

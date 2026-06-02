@@ -89,6 +89,23 @@ body {
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
+
+  /* Skip link for keyboard users */
+  .skip-link {
+    @apply fixed left-4 top-4 z-[100] -translate-y-20 rounded-full bg-gold px-5 py-2 text-sm font-semibold text-ink transition-transform focus:translate-y-0 focus-visible:outline-none;
+  }
+}
+
+@layer base {
+  /* Visible focus ring for any keyboard-focused interactive element */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 2px solid #e8b873;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
 }
 
 @layer utilities {

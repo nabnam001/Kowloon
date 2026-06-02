@@ -4,42 +4,52 @@
 export interface Location {
   id: string;
   name: string;
-  tagline: string;
+  tagline: { da: string; en: string };
   address: string;
   city: string;
   phone: string;
   phoneHref: string;
   mapsUrl: string;
   pageUrl: string;
-  blurb: string;
+  blurb: { da: string; en: string };
 }
 
 export const locations: Location[] = [
   {
     id: "frederiksgade",
     name: "Restaurant Kowloon",
-    tagline: "Vores store restaurant med ~70 pladser",
+    tagline: {
+      da: "Vores store restaurant med ~70 pladser",
+      en: "Our large restaurant with ~70 seats",
+    },
     address: "Frederiksgade 78",
     city: "8000 Aarhus C",
     phone: "86 19 19 98",
     phoneHref: "tel:+4586191998",
     mapsUrl: "https://maps.google.com/?q=Restaurant+Kowloon+Frederiksgade+78+Aarhus",
     pageUrl: "https://www.kowloon.dk/frederiksgade/frederiksgade.html",
-    blurb:
-      "Nær Rema1000 og Karma Sushi. Sæt dig til rette i en livlig atmosfære, eller fyld en take-away box fra buffeten.",
+    blurb: {
+      da: "Nær Rema1000 og Karma Sushi. Sæt dig til rette i en livlig atmosfære, eller fyld en take-away box fra buffeten.",
+      en: "Near Rema1000 and Karma Sushi. Settle in to a lively atmosphere, or fill a take-away box from the buffet.",
+    },
   },
   {
     id: "banegaardsgade",
     name: "Den 'lille' Kowloon",
-    tagline: "Hyggeligt spisested nær banegården",
+    tagline: {
+      da: "Hyggeligt spisested nær banegården",
+      en: "Cosy eatery near the central station",
+    },
     address: "Banegårdsgade 33",
     city: "8000 Aarhus C",
     phone: "86 19 42 11",
     phoneHref: "tel:+4586194211",
     mapsUrl: "https://maps.google.com/?q=Kowloon+Banegaardsgade+33+Aarhus",
     pageUrl: "https://www.kowloon.dk/banegaardsgade/banegaardsgade.html",
-    blurb:
-      "Nær Burger King og banegården. Et lille, intimt sted — perfekt til en hurtig asiatisk smagsoplevelse på farten.",
+    blurb: {
+      da: "Nær Burger King og banegården. Et lille, intimt sted — perfekt til en hurtig asiatisk smagsoplevelse på farten.",
+      en: "Near Burger King and the station. A small, intimate spot — perfect for a quick Asian taste experience on the go.",
+    },
   },
 ];
 
@@ -53,11 +63,18 @@ export const hours = {
     { day: "Lørdag", value: "12.00 – 21.00" },
     { day: "Søndag", value: "12.00 – 21.00" },
   ],
+  en: [
+    { day: "Monday", value: "Closed", closed: true },
+    { day: "Tuesday", value: "12.00 – 21.00" },
+    { day: "Wednesday", value: "12.00 – 21.00" },
+    { day: "Thursday", value: "12.00 – 21.00" },
+    { day: "Friday", value: "12.00 – 21.00" },
+    { day: "Saturday", value: "12.00 – 21.00" },
+    { day: "Sunday", value: "12.00 – 21.00" },
+  ],
   notes: {
-    da: [
-      "Køkkenet lukker kl. 20.30",
-      "Thaiboks lukker kl. 20.00",
-    ],
+    da: ["Køkkenet lukker kl. 20.30", "Thaiboks lukker kl. 20.00"],
+    en: ["Kitchen closes at 20.30", "Thai-box closes at 20.00"],
   },
 };
 

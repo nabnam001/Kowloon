@@ -6,7 +6,7 @@ import { Reveal } from "./Reveal";
 import { locations } from "@/data/site";
 
 export function Locations() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const photos: Record<string, string> = {
     frederiksgade: "/images/venue/front.png",
     banegaardsgade: "/images/venue/banegaardsgade-front.jpg",
@@ -59,8 +59,8 @@ export function Locations() {
                     <h3 className="heading-display text-2xl text-cream">
                       {loc.name}
                     </h3>
-                    <p className="mt-1 text-sm text-gold/80">{loc.tagline}</p>
-                    <p className="mt-4 text-cream/60">{loc.blurb}</p>
+                    <p className="mt-1 text-sm text-gold/80">{loc.tagline[lang]}</p>
+                    <p className="mt-4 text-cream/70">{loc.blurb[lang]}</p>
 
                     <dl className="mt-6 space-y-2 text-sm">
                       <div className="flex items-center gap-3 text-cream/80">
