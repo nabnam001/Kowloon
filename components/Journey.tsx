@@ -8,6 +8,7 @@ import { useLang } from "./LangProvider";
 import { DishTurntable } from "./DishTurntable";
 import { DishModal } from "./DishModal";
 import { AsiaMap } from "./AsiaMap";
+import { SceneParticles } from "./SceneParticles";
 
 export function Journey() {
   const { t, lang } = useLang();
@@ -53,6 +54,8 @@ export function Journey() {
 
       {/* drifting cultural motifs */}
       <Motifs themeKey={theme.key} accent={theme.accentSoft} />
+      {/* per-destination ambient particles */}
+      <SceneParticles themeKey={theme.key} accent={theme.accentSoft} />
 
       <div className="container-x relative">
         {/* Section heading */}

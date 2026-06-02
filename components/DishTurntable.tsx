@@ -5,10 +5,11 @@ import {
   motion,
   useMotionValue,
   useTransform,
+  useReducedMotion,
   animate,
   type PanInfo,
 } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Dish } from "@/data/menu";
 import { SpiceMeter } from "./SpiceMeter";
 import { useLang } from "./LangProvider";
@@ -32,6 +33,7 @@ export function DishTurntable({
   onOpen: (d: Dish) => void;
 }) {
   const { t } = useLang();
+  const reduce = useReducedMotion();
   const count = dishes.length;
   const step = 360 / Math.max(count, 1);
   // radius scales with how many dishes so they don't overlap
@@ -39,6 +41,7 @@ export function DishTurntable({
 
   const rotation = useMotionValue(0);
   const [active, setActive] = useState(0);
+  const interactedRef = useRef(false);
 
   // Which dish faces the viewer for a given rotation
   const indexFromRotation = (r: number) => {
@@ -55,7 +58,36 @@ export function DishTurntable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count, step]);
 
+  // Reset to the first dish whenever the destination (dish set) changes
+  useEffect(() => {
+    interactedRef.current = false;
+    rotation.set(0);
+    setActive(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dishes]);
+
+  // Gentle "chef's pick" auto-spin until the user interacts
+  useEffect(() => {
+    if (reduce) return;
+    const id = window.setInterval(() => {
+      if (interactedRef.current) return;
+      const current = rotation.get();
+      animate(rotation, current - step, {
+        type: "spring",
+        stiffness: 60,
+        damping: 18,
+      });
+    }, 2800);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce, step, dishes]);
+
+  const markInteracted = () => {
+    interactedRef.current = true;
+  };
+
   const goTo = (idx: number) => {
+    markInteracted();
     // shortest path to face dish `idx`
     const current = rotation.get();
     const target = -idx * step;
@@ -70,6 +102,7 @@ export function DishTurntable({
   const spin = (dir: 1 | -1) => goTo((active + dir + count) % count);
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
+    markInteracted();
     const current = rotation.get();
     const velocity = info.velocity.x;
     const momentum = velocity * 0.08;
@@ -108,6 +141,7 @@ export function DishTurntable({
           drag="x"
           dragElastic={0.06}
           dragMomentum={false}
+          onPointerDown={markInteracted}
           onDrag={(_, info) => rotation.set(rotation.get() + info.delta.x * 0.35)}
           onDragEnd={onDragEnd}
         >
