@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useLang } from "./LangProvider";
 import type { Lang } from "@/data/i18n";
 
-const sections = ["home", "menu", "about", "locations", "contact"] as const;
+const sections = ["home", "journey", "menu", "about", "locations", "contact"] as const;
 
 export function Navbar() {
   const { lang, setLang, t } = useLang();

@@ -1,7 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import { useRef } from "react";
 import { useLang } from "./LangProvider";
 
@@ -14,21 +21,41 @@ export function Hero() {
     offset: ["start start", "end start"],
   });
 
-  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const yText = useTransform(scrollYProgress, [0, 1], ["0%", "120%"]);
+  const yBg = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const yText = useTransform(scrollYProgress, [0, 1], ["0%", "90%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const dishY = useTransform(scrollYProgress, [0, 1], ["0%", "-25%"]);
+  const dishY = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
+  const dishRotate = useTransform(scrollYProgress, [0, 1], [0, 35]);
+
+  // pointer-based parallax for the hero dish
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const dishX = useSpring(useTransform(mx, [-0.5, 0.5], [-24, 24]), {
+    stiffness: 60,
+    damping: 18,
+  });
+  const dishTilt = useSpring(useTransform(my, [-0.5, 0.5], [10, -10]), {
+    stiffness: 60,
+    damping: 18,
+  });
+
+  const onMouse = (e: React.MouseEvent) => {
+    if (reduce) return;
+    const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    mx.set((e.clientX - r.left) / r.width - 0.5);
+    my.set((e.clientY - r.top) / r.height - 0.5);
+  };
 
   return (
     <section
       id="home"
       ref={ref}
+      onMouseMove={onMouse}
       className="relative grain flex min-h-[100svh] items-center overflow-hidden"
     >
-      {/* Background gradient — Hong Kong night */}
+      {/* Background — Hong Kong night */}
       <motion.div style={{ y: reduce ? 0 : yBg }} className="absolute inset-0 -z-20">
         <div className="absolute inset-0 bg-gradient-to-b from-ink-deep via-indigo-deep to-ink" />
-        {/* Real restaurant interior, dimmed for cinematic depth */}
         <Image
           src="/images/venue/interior-bg.jpg"
           alt=""
@@ -37,32 +64,50 @@ export function Hero() {
           sizes="100vw"
           className="object-cover opacity-25 mix-blend-luminosity"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-ink-deep/80 via-indigo-deep/70 to-ink" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(221,38,39,0.25),transparent_55%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(44,34,118,0.5),transparent_50%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-ink-deep/85 via-indigo-deep/70 to-ink" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(221,38,39,0.28),transparent_55%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(44,34,118,0.55),transparent_50%)]" />
       </motion.div>
 
       {/* Floating lantern glows */}
       <Lanterns reduce={!!reduce} />
+      {/* drifting embers */}
+      <Embers reduce={!!reduce} />
 
-      {/* Floating signature dish */}
+      {/* Hero signature dish with layered glow + steam */}
       <motion.div
-        style={{ y: reduce ? 0 : dishY }}
-        className="pointer-events-none absolute right-[-6%] top-1/2 -z-10 hidden -translate-y-1/2 lg:block"
+        style={{ y: reduce ? 0 : dishY, x: reduce ? 0 : dishX }}
+        className="pointer-events-none absolute right-[-8%] top-1/2 -z-10 hidden -translate-y-1/2 lg:block"
       >
         <motion.div
-          animate={reduce ? undefined : { y: [0, -18, 0] }}
-          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-          className="relative h-[34rem] w-[34rem]"
+          style={{ rotate: reduce ? 0 : dishRotate, rotateX: reduce ? 0 : dishTilt }}
+          className="relative h-[40rem] w-[40rem]"
         >
-          <div className="absolute inset-0 rounded-full bg-chilli/20 blur-3xl" />
-          <Image
-            src="/images/dishes/47.png"
-            alt=""
-            fill
-            priority
-            className="object-contain drop-shadow-[0_25px_60px_rgba(0,0,0,0.6)]"
+          {/* rotating halo */}
+          <motion.div
+            className="absolute inset-8 rounded-full"
+            style={{
+              background:
+                "conic-gradient(from 0deg, rgba(221,38,39,0.25), rgba(232,184,115,0.2), rgba(44,34,118,0.25), rgba(221,38,39,0.25))",
+              filter: "blur(40px)",
+            }}
+            animate={reduce ? undefined : { rotate: 360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
           />
+          <Steam reduce={!!reduce} />
+          <motion.div
+            animate={reduce ? undefined : { y: [0, -16, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="relative h-full w-full"
+          >
+            <Image
+              src="/images/dishes/47.png"
+              alt=""
+              fill
+              priority
+              className="object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.7)]"
+            />
+          </motion.div>
         </motion.div>
       </motion.div>
 
@@ -81,26 +126,30 @@ export function Hero() {
             {t.hero.kicker}
           </motion.span>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.8 }}
-            className="heading-display mt-6 text-5xl text-cream sm:text-6xl lg:text-7xl"
-          >
+          <h1 className="heading-display mt-6 text-5xl text-cream sm:text-6xl lg:text-7xl">
             {t.hero.title.split(" ").map((word, i) => (
-              <span key={i} className="inline-block">
-                <span className={i % 3 === 2 ? "text-gold-grad" : ""}>
-                  {word}
-                </span>
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 40, rotateX: -40 }}
+                animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                transition={{
+                  delay: 0.35 + i * 0.08,
+                  duration: 0.7,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="inline-block"
+                style={{ transformOrigin: "bottom" }}
+              >
+                <span className={i % 3 === 2 ? "text-gold-grad" : ""}>{word}</span>
                 &nbsp;
-              </span>
+              </motion.span>
             ))}
-          </motion.h1>
+          </h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
+            transition={{ delay: 0.7 }}
             className="mt-6 max-w-xl text-lg leading-relaxed text-cream/70"
           >
             {t.hero.subtitle}
@@ -109,10 +158,10 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.85 }}
             className="mt-9 flex flex-wrap items-center gap-4"
           >
-            <a href="#menu" className="btn-primary text-base">
+            <a href="#journey" className="btn-primary text-base">
               {t.hero.ctaMenu}
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                 <path
@@ -127,6 +176,18 @@ export function Hero() {
             <a href="#locations" className="btn-ghost text-base">
               {t.hero.ctaBook}
             </a>
+          </motion.div>
+
+          {/* trust row */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.05 }}
+            className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 text-xs text-cream/50"
+          >
+            <Trust>⭐ Elite Smiley</Trust>
+            <Trust>🇨🇳 🇹🇭 🇻🇳 {t.hero.trustKitchens}</Trust>
+            <Trust>📍 Aarhus C</Trust>
           </motion.div>
         </div>
       </motion.div>
@@ -150,9 +211,36 @@ export function Hero() {
         </div>
       </motion.div>
 
-      {/* Bottom fade into next section */}
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink to-transparent" />
     </section>
+  );
+}
+
+function Trust({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="flex items-center gap-1.5 whitespace-nowrap">{children}</span>
+  );
+}
+
+function Steam({ reduce }: { reduce: boolean }) {
+  if (reduce) return null;
+  return (
+    <div className="pointer-events-none absolute left-1/2 top-[18%] -z-0 -translate-x-1/2" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="absolute block h-24 w-2 rounded-full bg-white/20 blur-md"
+          style={{ left: (i - 1) * 26 }}
+          animate={{ opacity: [0, 0.5, 0], y: [-10, -90], scaleX: [1, 1.8] }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            delay: i * 0.9,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -180,6 +268,34 @@ function Lanterns({ reduce }: { reduce: boolean }) {
           }}
         />
       ))}
+    </div>
+  );
+}
+
+function Embers({ reduce }: { reduce: boolean }) {
+  if (reduce) return null;
+  const embers = Array.from({ length: 14 });
+  return (
+    <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+      {embers.map((_, i) => {
+        const left = (i * 37) % 100;
+        const size = 2 + (i % 3);
+        const dur = 8 + (i % 5) * 2;
+        return (
+          <motion.span
+            key={i}
+            className="absolute rounded-full bg-gold/60"
+            style={{ left: `${left}%`, bottom: -10, width: size, height: size }}
+            animate={{ y: [0, -600], opacity: [0, 0.8, 0], x: [0, (i % 2 ? 30 : -30)] }}
+            transition={{
+              duration: dur,
+              repeat: Infinity,
+              delay: (i % 7) * 1.2,
+              ease: "easeOut",
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

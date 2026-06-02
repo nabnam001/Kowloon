@@ -8,6 +8,11 @@ const nextConfig = {
   },
   trailingSlash: true,
   reactStrictMode: true,
+  eslint: {
+    // Lint is run as a separate `npm run lint` step (and in CI), so we skip the
+    // slow inline lint pass during `next build` for faster production builds.
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

@@ -12,6 +12,11 @@ export interface Location {
   mapsUrl: string;
   pageUrl: string;
   blurb: { da: string; en: string };
+  /** signature traits shown as a comparison */
+  features: { da: string; en: string; has: boolean }[];
+  /** headline stats */
+  stats: { value: string; label: { da: string; en: string } }[];
+  photo: string;
 }
 
 export const locations: Location[] = [
@@ -19,8 +24,8 @@ export const locations: Location[] = [
     id: "frederiksgade",
     name: "Restaurant Kowloon",
     tagline: {
-      da: "Vores store restaurant med ~70 pladser",
-      en: "Our large restaurant with ~70 seats",
+      da: "Den store oplevelse",
+      en: "The full experience",
     },
     address: "Frederiksgade 78",
     city: "8000 Aarhus C",
@@ -29,16 +34,29 @@ export const locations: Location[] = [
     mapsUrl: "https://maps.google.com/?q=Restaurant+Kowloon+Frederiksgade+78+Aarhus",
     pageUrl: "https://www.kowloon.dk/frederiksgade/frederiksgade.html",
     blurb: {
-      da: "Nær Rema1000 og Karma Sushi. Sæt dig til rette i en livlig atmosfære, eller fyld en take-away box fra buffeten.",
-      en: "Near Rema1000 and Karma Sushi. Settle in to a lively atmosphere, or fill a take-away box from the buffet.",
+      da: "Vores flagskib nær Rema1000 og Karma Sushi. Sæt dig til rette i den livlige stemning — eller fyld en take-away box fra buffeten.",
+      en: "Our flagship near Rema1000 and Karma Sushi. Settle into the lively atmosphere — or fill a take-away box from the buffet.",
     },
+    features: [
+      { da: "70 siddepladser", en: "70 seats", has: true },
+      { da: "Fuld à la carte", en: "Full à la carte", has: true },
+      { da: "Take-away buffet box", en: "Take-away buffet box", has: true },
+      { da: "Vin & øl udvalg", en: "Wine & beer selection", has: true },
+      { da: "Bordbestilling", en: "Table reservations", has: true },
+    ],
+    stats: [
+      { value: "70", label: { da: "pladser", en: "seats" } },
+      { value: "50+", label: { da: "retter", en: "dishes" } },
+      { value: "3", label: { da: "køkkener", en: "kitchens" } },
+    ],
+    photo: "/images/venue/front.png",
   },
   {
     id: "banegaardsgade",
     name: "Den 'lille' Kowloon",
     tagline: {
-      da: "Hyggeligt spisested nær banegården",
-      en: "Cosy eatery near the central station",
+      da: "Hurtigt & hyggeligt",
+      en: "Quick & cosy",
     },
     address: "Banegårdsgade 33",
     city: "8000 Aarhus C",
@@ -50,6 +68,19 @@ export const locations: Location[] = [
       da: "Nær Burger King og banegården. Et lille, intimt sted — perfekt til en hurtig asiatisk smagsoplevelse på farten.",
       en: "Near Burger King and the station. A small, intimate spot — perfect for a quick Asian taste experience on the go.",
     },
+    features: [
+      { da: "Intim størrelse", en: "Intimate size", has: true },
+      { da: "Take-away & på farten", en: "Take-away & on the go", has: true },
+      { da: "Klassiske favoritter", en: "Classic favourites", has: true },
+      { da: "Tæt på banegården", en: "Next to the station", has: true },
+      { da: "Stor restaurant-buffet", en: "Large dine-in buffet", has: false },
+    ],
+    stats: [
+      { value: "2 min", label: { da: "fra banegård", en: "from station" } },
+      { value: "🥡", label: { da: "take-away", en: "take-away" } },
+      { value: "1999", label: { da: "siden", en: "since" } },
+    ],
+    photo: "/images/venue/banegaardsgade-front.jpg",
   },
 ];
 

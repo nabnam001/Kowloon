@@ -4,6 +4,7 @@ export const translations = {
   da: {
     nav: {
       home: "Forside",
+      journey: "Rejsen",
       menu: "Menukort",
       about: "Om os",
       locations: "Find os",
@@ -17,6 +18,7 @@ export const translations = {
       ctaMenu: "Se menukortet",
       ctaBook: "Ring og book bord",
       scroll: "Rul ned",
+      trustKitchens: "3 køkkener",
     },
     highlights: {
       title: "Hvorfor Kowloon?",
@@ -89,6 +91,15 @@ export const translations = {
       tabDrinks: "Drikkevarer",
       tabWine: "Vin",
     },
+    journey: {
+      kicker: "Den kulinariske rejse",
+      title: "Tre lande. Én rejse.",
+      subtitle:
+        "Stig ombord og rejs gennem Kina, Thailand og Vietnam. Drej fadet og udforsk hver destinations signaturretter.",
+      boarding: "Boarding",
+      dragHint: "Træk for at dreje fadet",
+      fullMenu: "Se hele menukortet",
+    },
     locations: {
       kicker: "Find os",
       title: "To restauranter i Aarhus centrum",
@@ -125,6 +136,7 @@ export const translations = {
   en: {
     nav: {
       home: "Home",
+      journey: "Journey",
       menu: "Menu",
       about: "About",
       locations: "Find us",
@@ -138,6 +150,7 @@ export const translations = {
       ctaMenu: "See the menu",
       ctaBook: "Call to book a table",
       scroll: "Scroll down",
+      trustKitchens: "3 kitchens",
     },
     highlights: {
       title: "Why Kowloon?",
@@ -210,6 +223,15 @@ export const translations = {
       title: "Something to drink",
       tabDrinks: "Drinks",
       tabWine: "Wine",
+    },
+    journey: {
+      kicker: "The culinary journey",
+      title: "Three countries. One journey.",
+      subtitle:
+        "Step aboard and travel through China, Thailand and Vietnam. Spin the table and explore each destination's signature dishes.",
+      boarding: "Boarding",
+      dragHint: "Drag to spin the table",
+      fullMenu: "See the full menu",
     },
     locations: {
       kicker: "Find us",

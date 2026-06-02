@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import type { Dish } from "@/data/menu";
 import { useLang } from "./LangProvider";
 import { SpiceMeter } from "./SpiceMeter";
@@ -14,6 +14,29 @@ export function DishCard({
   onOpen: (d: Dish) => void;
 }) {
   const { t } = useLang();
+
+  // pointer-driven 3D tilt
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-7, 7]), {
+    stiffness: 150,
+    damping: 15,
+  });
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [7, -7]), {
+    stiffness: 150,
+    damping: 15,
+  });
+
+  const onMove = (e: React.MouseEvent) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - r.left) / r.width - 0.5);
+    my.set((e.clientY - r.top) / r.height - 0.5);
+  };
+  const onLeave = () => {
+    mx.set(0);
+    my.set(0);
+  };
+
   return (
     <motion.button
       layout
@@ -22,8 +45,11 @@ export function DishCard({
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.4 }}
       onClick={() => onOpen(dish)}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d", transformPerspective: 900 }}
       aria-label={`${dish.name} — ${dish.price} kr. ${t.menu.details}`}
-      className="group relative flex flex-col overflow-hidden rounded-3xl glass text-left transition-all duration-500 hover:-translate-y-1.5 hover:border-gold/30 hover:shadow-xl hover:shadow-chilli/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+      className="group relative flex flex-col overflow-hidden rounded-3xl glass text-left transition-shadow duration-500 hover:border-gold/30 hover:shadow-xl hover:shadow-chilli/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-indigo-deep/60 to-ink">
         {dish.hasImage ? (
@@ -32,6 +58,7 @@ export function DishCard({
             alt={dish.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            style={{ transform: "translateZ(40px)" }}
             className="object-contain p-3 transition-transform duration-700 ease-out group-hover:scale-110 group-hover:-rotate-2"
           />
         ) : (

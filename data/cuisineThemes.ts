@@ -1,0 +1,82 @@
+// Theming for the "Culinary Journey" — each cuisine is its own immersive world.
+// Colors, gradients, cultural motifs and a curated set of signature dishes.
+
+export type JourneyKey = "kina" | "thailand" | "vietnam";
+
+export interface CuisineTheme {
+  key: JourneyKey;
+  /** ISO-ish label for the boarding-pass feel */
+  code: string;
+  country: { da: string; en: string };
+  flag: string;
+  tagline: { da: string; en: string };
+  intro: { da: string; en: string };
+  /** primary accent + glow used across the scene */
+  accent: string;
+  accentSoft: string;
+  glow: string;
+  /** full-bleed background gradient for the scene */
+  bg: string;
+  /** curated, photogenic signature dish ids (must have images) */
+  signatures: string[];
+}
+
+export const cuisineThemes: CuisineTheme[] = [
+  {
+    key: "kina",
+    code: "CN",
+    country: { da: "Kina", en: "China" },
+    flag: "🇨🇳",
+    tagline: {
+      da: "Wokken i fuld fart",
+      en: "Woks at full blast",
+    },
+    intro: {
+      da: "Sprøde ænder, røget østerssauce og glaserede klassikere fra Hong Kongs travle gader.",
+      en: "Crispy ducks, smoky oyster sauce and glazed classics from Hong Kong's bustling streets.",
+    },
+    accent: "#E23B3B",
+    accentSoft: "#FF6B5E",
+    glow: "rgba(226,59,59,0.45)",
+    bg: "radial-gradient(ellipse at 30% 20%, rgba(226,59,59,0.28), transparent 55%), radial-gradient(ellipse at 80% 80%, rgba(200,18,46,0.35), transparent 50%), linear-gradient(160deg, #2A0A12 0%, #14060B 60%, #0B0A14 100%)",
+    signatures: ["21", "22", "19", "13", "5", "6", "15", "12"],
+  },
+  {
+    key: "thailand",
+    code: "TH",
+    country: { da: "Thailand", en: "Thailand" },
+    flag: "🇹🇭",
+    tagline: {
+      da: "Karry, kokos & krydderier",
+      en: "Curry, coconut & spice",
+    },
+    intro: {
+      da: "Cremede karryretter, friske krydderurter og syrlig balance fra det thailandske køkken.",
+      en: "Creamy curries, fresh herbs and that sour-sweet balance from the Thai kitchen.",
+    },
+    accent: "#13B981",
+    accentSoft: "#34E0A8",
+    glow: "rgba(19,185,129,0.4)",
+    bg: "radial-gradient(ellipse at 25% 25%, rgba(19,185,129,0.26), transparent 55%), radial-gradient(ellipse at 80% 75%, rgba(232,184,115,0.28), transparent 50%), linear-gradient(160deg, #06231C 0%, #0A1810 55%, #0B0A14 100%)",
+    signatures: ["47", "46", "32", "37", "59", "60", "62", "42"],
+  },
+  {
+    key: "vietnam",
+    code: "VN",
+    country: { da: "Vietnam", en: "Vietnam" },
+    flag: "🇻🇳",
+    tagline: {
+      da: "Dampende nudelsupper",
+      en: "Steaming noodle soups",
+    },
+    intro: {
+      da: "Aromatiske phở, hjemmelavede nudler og friske urter — sjælen i det vietnamesiske køkken.",
+      en: "Aromatic phở, house-made noodles and fresh herbs — the soul of Vietnamese cooking.",
+    },
+    accent: "#F2C14E",
+    accentSoft: "#FFD970",
+    glow: "rgba(242,193,78,0.42)",
+    bg: "radial-gradient(ellipse at 30% 22%, rgba(242,193,78,0.24), transparent 55%), radial-gradient(ellipse at 78% 78%, rgba(218,38,39,0.3), transparent 50%), linear-gradient(160deg, #241A06 0%, #15100A 55%, #0B0A14 100%)",
+    signatures: ["34", "74", "89", "81", "87", "82", "36", "29"],
+  },
+];

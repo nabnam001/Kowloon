@@ -21,6 +21,17 @@ const cuisineOrder: (Cuisine | "all")[] = [
   "dessert",
 ];
 
+const cuisineGlow: Record<Cuisine | "all", string> = {
+  all: "rgba(221,38,39,0.14)",
+  forret: "rgba(232,184,115,0.16)",
+  kina: "rgba(226,59,59,0.18)",
+  thailand: "rgba(19,185,129,0.16)",
+  vietnam: "rgba(242,193,78,0.16)",
+  vegetar: "rgba(52,224,168,0.16)",
+  grill: "rgba(232,184,115,0.16)",
+  dessert: "rgba(244,114,182,0.16)",
+};
+
 export function Menu() {
   const { t, lang } = useLang();
   const [cuisine, setCuisine] = useState<Cuisine | "all">("all");
@@ -54,8 +65,14 @@ export function Menu() {
 
   return (
     <section id="menu" className="relative scroll-mt-24 py-20 sm:py-28">
-      {/* ambient glow */}
-      <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full bg-chilli/10 blur-[120px]" />
+      {/* ambient glow shifts with the selected cuisine */}
+      <motion.div
+        key={cuisine}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full blur-[120px]"
+        style={{ background: cuisineGlow[cuisine] }}
+      />
 
       <div className="container-x relative">
         <Reveal className="mx-auto max-w-2xl text-center">
