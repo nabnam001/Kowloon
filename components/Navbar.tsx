@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLang } from "./LangProvider";
+import { useSound } from "./SoundProvider";
 import type { Lang } from "@/data/i18n";
 
 const sections = ["home", "journey", "menu", "about", "locations", "contact"] as const;
@@ -96,6 +97,7 @@ export function Navbar() {
           </ul>
 
           <div className="flex items-center gap-3">
+            <SoundToggle t={t} />
             <LangToggle lang={lang} setLang={setLang} t={t} />
             <a href="#locations" className="btn-primary hidden sm:inline-flex">
               {t.hero.ctaBook}
@@ -210,5 +212,50 @@ function LangToggle({
         </button>
       ))}
     </div>
+  );
+}
+
+function SoundToggle({ t }: { t: ReturnType<typeof useLang>["t"] }) {
+  const { enabled, toggle } = useSound();
+  return (
+    <button
+      onClick={toggle}
+      aria-pressed={enabled}
+      aria-label={enabled ? t.common.soundOff : t.common.soundOn}
+      title={enabled ? t.common.soundOff : t.common.soundOn}
+      className="flex h-9 w-9 items-center justify-center rounded-full glass text-cream/70 transition-colors hover:text-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink"
+    >
+      {enabled ? (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M4 9v6h4l5 4V5L8 9H4Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      ) : (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M4 9v6h4l5 4V5L8 9H4Z"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinejoin="round"
+          />
+          <path
+            d="m16 9 5 6m0-6-5 6"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      )}
+    </button>
   );
 }

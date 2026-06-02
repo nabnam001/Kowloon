@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cuisineThemes, type JourneyKey } from "@/data/cuisineThemes";
 import { dishes as allDishes, type Dish } from "@/data/menu";
@@ -9,9 +9,11 @@ import { DishTurntable } from "./DishTurntable";
 import { DishModal } from "./DishModal";
 import { AsiaMap } from "./AsiaMap";
 import { SceneParticles } from "./SceneParticles";
+import { useSound } from "./SoundProvider";
 
 export function Journey() {
   const { t, lang } = useLang();
+  const { play } = useSound();
   const [idx, setIdx] = useState(0);
   const [dir, setDir] = useState(1);
   const [selected, setSelected] = useState<Dish | null>(null);
@@ -24,9 +26,36 @@ export function Journey() {
       .filter((d): d is Dish => Boolean(d && d.hasImage));
   }, [theme]);
 
+  // keyboard arrows fly between destinations when the section is in view
+  const sectionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    let inView = false;
+    const obs = new IntersectionObserver(
+      ([e]) => (inView = e.isIntersecting),
+      { threshold: 0.4 }
+    );
+    obs.observe(el);
+    const onKey = (e: KeyboardEvent) => {
+      if (!inView) return;
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.key === "ArrowRight") fly(idx + 1);
+      if (e.key === "ArrowLeft") fly(idx - 1);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      obs.disconnect();
+      window.removeEventListener("keydown", onKey);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx]);
+
   const fly = (next: number) => {
     setDir(next > idx ? 1 : -1);
     setIdx((next + cuisineThemes.length) % cuisineThemes.length);
+    play("flight");
   };
 
   const flyToKey = (key: JourneyKey) => {
@@ -34,9 +63,15 @@ export function Journey() {
     if (next >= 0 && next !== idx) fly(next);
   };
 
+  const openDish = (d: Dish) => {
+    play("open");
+    setSelected(d);
+  };
+
   return (
     <section
       id="journey"
+      ref={sectionRef}
       className="relative scroll-mt-20 overflow-hidden py-20 sm:py-28"
     >
       {/* Animated themed background */}
@@ -197,7 +232,7 @@ export function Journey() {
                 accent={theme.accent}
                 accentSoft={theme.accentSoft}
                 glow={theme.glow}
-                onOpen={setSelected}
+                onOpen={openDish}
               />
             </motion.div>
           </AnimatePresence>

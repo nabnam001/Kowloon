@@ -136,6 +136,8 @@ export const translations = {
       skip: "Spring til menukort",
       languageDa: "Skift til dansk",
       languageEn: "Switch to English",
+      soundOn: "Slå lyd til",
+      soundOff: "Slå lyd fra",
     },
   },
   en: {
@@ -274,6 +276,8 @@ export const translations = {
       skip: "Skip to menu",
       languageDa: "Skift til dansk",
       languageEn: "Switch to English",
+      soundOn: "Turn sound on",
+      soundOff: "Turn sound off",
     },
   },
 } as const;
