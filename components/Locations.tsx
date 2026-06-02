@@ -73,8 +73,6 @@ export function Locations() {
                 </div>
 
                 <div className="relative flex flex-1 flex-col p-7">
-                  <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-chilli/10 blur-3xl transition-opacity duration-700 group-hover:bg-chilli/25" />
-
                   <div className="relative">
                     <div className="flex items-baseline justify-between gap-2">
                       <h3 className="heading-display text-2xl text-cream">

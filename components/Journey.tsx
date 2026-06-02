@@ -10,6 +10,7 @@ import { DishModal } from "./DishModal";
 import { AsiaMap } from "./AsiaMap";
 import { SceneParticles } from "./SceneParticles";
 import { InkBackdrop } from "./InkBackdrop";
+import { SmokeOverlay } from "./SmokeOverlay";
 import { useSound } from "./SoundProvider";
 
 export function Journey() {
@@ -90,6 +91,8 @@ export function Journey() {
 
       {/* temple silhouettes */}
       <InkBackdrop variant="soft" />
+      {/* atmospheric smoke haze */}
+      <SmokeOverlay opacity={0.12} />
       {/* drifting cultural motifs */}
       <Motifs themeKey={theme.key} accent={theme.accentSoft} />
       {/* per-destination ambient particles */}

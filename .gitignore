@@ -30,3 +30,6 @@ next-env.d.ts
 # generated public assets (rebuilt by scripts/prepare-images.mjs)
 /public/images/
 /public/brand/
+
+# large vector source for the smoke texture (the .jpg is used instead)
+*.eps

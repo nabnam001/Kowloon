@@ -13,6 +13,7 @@ import { useRef } from "react";
 import { useLang } from "./LangProvider";
 import { InkBackdrop } from "./InkBackdrop";
 import { Steam } from "./Steam";
+import { SmokeOverlay } from "./SmokeOverlay";
 
 export function Hero() {
   const { t } = useLang();
@@ -67,6 +68,7 @@ export function Hero() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink-deep/80 via-ink/70 to-ink" />
         <InkBackdrop variant="hero" />
+        <SmokeOverlay opacity={0.18} />
       </motion.div>
 
       {/* Hero signature dish (mono ink halo + steam) */}

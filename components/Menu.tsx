@@ -1,17 +1,25 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { dishes, CUISINE_LABELS, type Cuisine, type Dish } from "@/data/menu";
+import {
+  dishesAt,
+  CUISINE_LABELS,
+  type Cuisine,
+  type Dish,
+  type LocationId,
+} from "@/data/menu";
+import { locations } from "@/data/site";
 import { useLang } from "./LangProvider";
 import { Reveal } from "./Reveal";
-import { DishCard } from "./DishCard";
 import { DishModal } from "./DishModal";
+import { DietBadge } from "./DietBadge";
+import { SpiceMeter } from "./SpiceMeter";
 
 type DietFilter = "all" | "veg" | "vegan" | "new" | "spicy";
 
-const cuisineOrder: (Cuisine | "all")[] = [
-  "all",
+const sectionOrder: Cuisine[] = [
   "forret",
   "kina",
   "thailand",
@@ -21,28 +29,29 @@ const cuisineOrder: (Cuisine | "all")[] = [
   "dessert",
 ];
 
-const cuisineGlow: Record<Cuisine | "all", string> = {
-  all: "rgba(178,58,46,0.10)",
-  forret: "rgba(236,230,218,0.06)",
-  kina: "rgba(178,58,46,0.12)",
-  thailand: "rgba(236,230,218,0.07)",
-  vietnam: "rgba(178,58,46,0.10)",
-  vegetar: "rgba(52,211,153,0.08)",
-  grill: "rgba(236,230,218,0.06)",
-  dessert: "rgba(236,230,218,0.07)",
+// Kanji label per section for the Raku-style bilingual header
+const sectionKanji: Record<Cuisine, string> = {
+  forret: "前菜",
+  kina: "中華",
+  thailand: "タイ",
+  vietnam: "越南",
+  vegetar: "野菜",
+  grill: "焼き",
+  dessert: "甘味",
 };
 
 export function Menu() {
   const { t, lang } = useLang();
-  const [cuisine, setCuisine] = useState<Cuisine | "all">("all");
+  const [loc, setLoc] = useState<LocationId>("frederiksgade");
   const [diet, setDiet] = useState<DietFilter>("all");
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<Dish | null>(null);
 
+  const shopDishes = useMemo(() => dishesAt(loc), [loc]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return dishes.filter((d) => {
-      if (cuisine !== "all" && d.cuisine !== cuisine) return false;
+    return shopDishes.filter((d) => {
       if (diet === "veg" && !d.veg) return false;
       if (diet === "vegan" && !d.vegan) return false;
       if (diet === "new" && !d.isNew) return false;
@@ -53,7 +62,13 @@ export function Menu() {
       }
       return true;
     });
-  }, [cuisine, diet, query]);
+  }, [shopDishes, diet, query]);
+
+  const grouped = useMemo(() => {
+    return sectionOrder
+      .map((c) => ({ cuisine: c, items: filtered.filter((d) => d.cuisine === c) }))
+      .filter((g) => g.items.length > 0);
+  }, [filtered]);
 
   const dietChips: { id: DietFilter; label: string }[] = [
     { id: "all", label: t.menu.filters.all },
@@ -65,136 +80,213 @@ export function Menu() {
 
   return (
     <section id="menu" className="relative scroll-mt-24 py-20 sm:py-28">
-      {/* ambient glow shifts with the selected cuisine */}
-      <motion.div
-        key={cuisine}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 rounded-full blur-[120px]"
-        style={{ background: cuisineGlow[cuisine] }}
-      />
-
       <div className="container-x relative">
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="kicker justify-center">
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-8 bg-chilli" />
             {t.menu.kicker}
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-8 bg-chilli" />
           </span>
           <h2 className="heading-display mt-4 text-4xl text-cream sm:text-5xl">
             {t.menu.title}
           </h2>
-          <p className="mt-4 text-cream/60">{t.menu.subtitle}</p>
+          <p className="mt-4 text-cream/60">{t.menu.locationSubtitle}</p>
         </Reveal>
 
-        {/* Controls */}
-        <div className="sticky top-[68px] z-30 mt-10 -mx-5 px-5 py-3 sm:mx-0 sm:rounded-2xl sm:px-4">
-          <div className="rounded-2xl glass p-3 sm:p-4">
-            {/* Cuisine tabs */}
-            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {cuisineOrder.map((c) => {
-                const label =
-                  c === "all"
-                    ? t.menu.filters.all
-                    : CUISINE_LABELS[c][lang];
-                const isActive = cuisine === c;
-                return (
-                  <button
-                    key={c}
-                    onClick={() => setCuisine(c)}
-                    aria-pressed={isActive}
-                    className={`relative whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink ${
-                      isActive
-                        ? "text-ink"
-                        : "text-cream/70 hover:text-cream"
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.span
-                        layoutId="cuisine-pill"
-                        className="absolute inset-0 rounded-full bg-cream"
-                        transition={{ type: "spring", damping: 28, stiffness: 320 }}
-                      />
-                    )}
-                    <span className="relative">{label}</span>
-                  </button>
-                );
-              })}
-              {/* jump to drinks & wine */}
-              <a
-                href="#drinks"
-                className="ml-1 flex items-center gap-1.5 whitespace-nowrap rounded-full border border-cream/15 px-4 py-2 text-sm font-semibold text-cream/70 transition-colors hover:border-cream/40 hover:text-cream"
-              >
-                {t.drinks.tabDrinks} & {t.drinks.tabWine}
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </a>
-            </div>
-
-            {/* Diet chips + search */}
-            <div className="mt-3 flex flex-col gap-3 border-t border-white/5 pt-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex flex-wrap gap-2">
-                {dietChips.map((chip) => (
-                  <button
-                    key={chip.id}
-                    onClick={() => setDiet(chip.id)}
-                    aria-pressed={diet === chip.id}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink ${
-                      diet === chip.id
-                        ? "bg-chilli text-white"
-                        : "bg-white/5 text-cream/70 hover:bg-white/10 hover:text-cream"
-                    }`}
-                  >
-                    {chip.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="relative sm:w-64">
-                <svg
-                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-cream/40"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
+        {/* Location switcher — choose a shop, see what it serves */}
+        <div className="mt-10 flex justify-center">
+          <div className="grid w-full max-w-2xl grid-cols-2 gap-3">
+            {locations.map((l) => {
+              const isActive = l.id === (loc as string);
+              return (
+                <button
+                  key={l.id}
+                  onClick={() => setLoc(l.id as LocationId)}
+                  aria-pressed={isActive}
+                  className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition-all ${
+                    isActive
+                      ? "border-chilli/60 bg-chilli/10"
+                      : "border-cream/12 bg-ink-800/50 hover:border-cream/30"
+                  }`}
                 >
-                  <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-                  <path
-                    d="m20 20-3-3"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder={t.menu.search}
-                  className="w-full rounded-full border border-white/10 bg-ink/60 py-2 pl-9 pr-4 text-sm text-cream placeholder:text-cream/40 focus:border-gold/50 focus:outline-none"
-                  aria-label={t.menu.search}
-                />
-              </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`h-2 w-2 rounded-full ${
+                        isActive ? "bg-chilli" : "bg-cream/30"
+                      }`}
+                    />
+                    <span className="text-[11px] font-semibold uppercase tracking-widest text-cream/50">
+                      {l.city}
+                    </span>
+                  </div>
+                  <h3 className="mt-1 font-display text-lg font-semibold text-cream">
+                    {l.name}
+                  </h3>
+                  <p className="mt-0.5 text-xs text-cream/50">{l.address}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Diet chips + search */}
+        <div className="sticky top-[64px] z-30 mx-auto mt-6 max-w-3xl">
+          <div className="flex flex-col gap-3 rounded-2xl border border-cream/10 bg-ink-deep/80 p-3 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap gap-2">
+              {dietChips.map((chip) => (
+                <button
+                  key={chip.id}
+                  onClick={() => setDiet(chip.id)}
+                  aria-pressed={diet === chip.id}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                    diet === chip.id
+                      ? "bg-chilli text-cream"
+                      : "bg-white/5 text-cream/70 hover:bg-white/10 hover:text-cream"
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+            <div className="relative sm:w-56">
+              <svg
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-cream/40"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+              >
+                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+                <path d="m20 20-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t.menu.search}
+                className="w-full rounded-full border border-white/10 bg-ink/60 py-2 pl-9 pr-4 text-sm text-cream placeholder:text-cream/40 focus:border-gold/50 focus:outline-none"
+                aria-label={t.menu.search}
+              />
             </div>
           </div>
         </div>
 
-        {/* Count */}
-        <p className="mt-6 text-center text-sm text-cream/60" aria-live="polite">
-          {t.menu.count(filtered.length)}
-        </p>
+        {/* legend */}
+        <div className="mx-auto mt-5 flex max-w-3xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-cream/45">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex h-4 items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 text-emerald-300">V</span>
+            {t.menu.vegLabel}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex h-4 items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 text-emerald-300">VG</span>
+            {t.menu.veganLabel}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <SpiceMeter level={2} /> {t.menu.spice}
+          </span>
+        </div>
 
-        {/* Grid */}
-        <motion.div
-          layout
-          className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
-        >
-          <AnimatePresence mode="popLayout">
-            {filtered.map((dish) => (
-              <DishCard key={dish.id} dish={dish} onOpen={setSelected} />
+        {/* Menu list grouped by section */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={loc}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.35 }}
+            className="mx-auto mt-12 max-w-3xl"
+          >
+            {grouped.map((group) => (
+              <div key={group.cuisine} className="mb-14 scroll-mt-32">
+                {/* bilingual section header */}
+                <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
+                  <div className="flex items-baseline gap-3">
+                    <h3 className="heading-display text-2xl text-cream sm:text-3xl">
+                      {CUISINE_LABELS[group.cuisine][lang]}
+                    </h3>
+                    <span className="font-display text-lg text-cream/35">
+                      {sectionKanji[group.cuisine]}
+                    </span>
+                  </div>
+                  <span className="text-xs uppercase tracking-widest text-cream/35">
+                    {group.items.length}
+                  </span>
+                </div>
+
+                <ul className="divide-y divide-cream/[0.06]">
+                  {group.items.map((dish) => (
+                    <li key={dish.id}>
+                      <button
+                        onClick={() => setSelected(dish)}
+                        className="group flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-cream/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:gap-5 sm:rounded-xl sm:px-3"
+                      >
+                        {/* thumbnail */}
+                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-ink-700 sm:h-20 sm:w-20">
+                          {dish.hasImage ? (
+                            <Image
+                              src={`/images/dishes/${dish.id}.png`}
+                              alt={dish.name}
+                              fill
+                              sizes="80px"
+                              className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-cream/20">
+                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M3 7a2 2 0 0 1 2-2h2l1-2h8l1 2h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" strokeWidth="1.4" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* text */}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[11px] text-cream/35">
+                              {dish.id}
+                            </span>
+                            <h4 className="truncate font-display text-base font-semibold text-cream">
+                              {dish.name}
+                            </h4>
+                            {dish.isNew && (
+                              <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
+                                {t.menu.newLabel}
+                              </span>
+                            )}
+                            <DietBadge dish={dish} />
+                            {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
+                          </div>
+                          {dish.desc && (
+                            <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-cream/55">
+                              {dish.desc}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* price */}
+                        <div className="shrink-0 text-right">
+                          <span className="font-display text-lg font-bold text-gold">
+                            {dish.price},-
+                          </span>
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </AnimatePresence>
-        </motion.div>
+
+            {/* Drinks & wine pointer */}
+            <div className="flex flex-col items-center gap-3 border-t border-cream/10 pt-10 text-center">
+              <p className="text-sm text-cream/50">{t.menu.drinksHint}</p>
+              <a href="#drinks" className="btn-ghost text-sm">
+                {t.drinks.tabDrinks} & {t.drinks.tabWine}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </a>
+            </div>
+          </motion.div>
+        </AnimatePresence>
 
         {filtered.length === 0 && (
           <p className="py-16 text-center text-cream/50">{t.menu.empty}</p>

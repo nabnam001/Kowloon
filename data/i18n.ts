@@ -46,6 +46,8 @@ export const translations = {
       kicker: "Menukort",
       title: "Udforsk menuen",
       subtitle: "Filtrér efter køkken, vegetarisk eller styrke. Tryk på en ret for detaljer.",
+      locationSubtitle: "Vælg en restaurant og se, hvad den serverer. Tryk på en ret for detaljer.",
+      drinksHint: "Tørstig? Se hele udvalget af drikkevarer og vin.",
       filters: {
         all: "Alle",
         veg: "Vegetar",
@@ -206,6 +208,8 @@ export const translations = {
       kicker: "Menu",
       title: "Explore the menu",
       subtitle: "Filter by cuisine, vegetarian or heat. Tap a dish for details.",
+      locationSubtitle: "Pick a restaurant and see what it serves. Tap a dish for details.",
+      drinksHint: "Thirsty? See the full selection of drinks and wine.",
       filters: {
         all: "All",
         veg: "Vegetarian",

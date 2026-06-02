@@ -59,10 +59,9 @@ export function Highlights() {
                 href={i === 2 ? contact.eliteSmiley : "#menu"}
                 target={i === 2 ? "_blank" : undefined}
                 rel={i === 2 ? "noopener noreferrer" : undefined}
-                className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-3xl glass p-7 transition-all duration-500 hover:-translate-y-1 hover:border-gold/30"
+                className="group relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl border border-cream/10 bg-ink-800/50 p-7 transition-all duration-500 hover:-translate-y-1 hover:border-cream/25"
               >
-                <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-chilli/10 blur-2xl transition-opacity duration-500 group-hover:opacity-100 sm:opacity-0" />
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-soft/30 to-chilli/20 text-gold">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-cream/10 bg-ink-700 text-gold">
                   {i === 2 ? (
                     <Image
                       src="/brand/elite-smiley.png"

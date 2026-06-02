@@ -34,6 +34,29 @@ export const CUISINE_LABELS: Record<Cuisine, { da: string; en: string }> = {
   dessert: { da: "Desserter", en: "Desserts" },
 };
 
+export type LocationId = "frederiksgade" | "banegaardsgade";
+
+// The small Banegårdsgade shop is take-away focused and does not carry the
+// large dine-in specials below. Everything else is available at both shops.
+// (Modelled from the venue profiles — adjust freely as the real menus differ.)
+const FREDERIKSGADE_ONLY = new Set<string>([
+  "19", // store indbagte kinarejer
+  "20", // omelet i gul karry (dine-in)
+  "21", // and ala peking
+  "22", // stegt and i østerssauce
+  "59", // gul karry m. blæksprutte, rejer & kammuslinger
+  "60", // and i matsaman karry
+  "89", // mì vịt tiềm (stegt and)
+  "88", // bún mắm (fiskesuppe)
+  "95", // bánh canh cua (krabbe) NYHED
+]);
+
+/** Which dishes a given shop serves. */
+export function dishesAt(loc: LocationId): Dish[] {
+  if (loc === "frederiksgade") return dishes;
+  return dishes.filter((d) => !FREDERIKSGADE_ONLY.has(d.id));
+}
+
 export const dishes: Dish[] = [
   // ---------- FORRETTER (65,-) ----------
   {

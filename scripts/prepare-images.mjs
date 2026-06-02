@@ -178,6 +178,7 @@ const venueMap = {
   "banegaardsgade-outside": "banegaardsgade/banegaardsgade-card3-outside.jpg",
   "banegaardsgade-interior-1": "banegaardsgade/banegaardsgade-restaurantenInside.jpg",
   "banegaardsgade-interior-2": "banegaardsgade/banegaardsgade-restaurantenInside2.jpg",
+  "smoke": "banegaardsgade/display-background-with-smoky-atmosphere/smokey_atmosphere_background_2307.jpg",
 };
 
 async function exists(p) {
@@ -230,7 +231,17 @@ async function copyVenue() {
     const srcPath = path.join(ROOT, src);
     const srcExt = path.extname(src);
     if (await exists(srcPath)) {
-      await copyFile(srcPath, path.join(VENUE_OUT, `${dest}${srcExt}`));
+      const destPath = path.join(VENUE_OUT, `${dest}${srcExt}`);
+      await copyFile(srcPath, destPath);
+      // The smoke texture ships at 5000px; downscale it for the web overlay.
+      if (dest === "smoke") {
+        try {
+          const { execFileSync } = await import("node:child_process");
+          execFileSync("sips", ["-Z", "1600", destPath], { stdio: "ignore" });
+        } catch {
+          // sips unavailable (non-macOS) — keep the full-size copy.
+        }
+      }
       ok++;
     } else {
       console.warn(`  ⚠ missing venue photo: ${src}`);
