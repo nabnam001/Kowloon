@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   dishesAt,
   CUISINE_LABELS,
+  localizeDish,
   type Cuisine,
   type LocationId,
 } from "@/data/menu";
@@ -61,12 +62,13 @@ export function Menu() {
       if (diet === "new" && !d.isNew) return false;
       if (diet === "spicy" && (d.spice ?? 0) < 2) return false;
       if (q) {
-        const hay = `${d.id} ${d.name} ${d.desc ?? ""}`.toLowerCase();
+        const loc = localizeDish(d, lang);
+        const hay = `${d.id} ${d.name} ${d.desc ?? ""} ${loc.name} ${loc.desc ?? ""}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
-  }, [shopDishes, diet, query]);
+  }, [shopDishes, diet, query, lang]);
 
   const grouped = useMemo(() => {
     return sectionOrder
@@ -341,28 +343,31 @@ export function Menu() {
                   kanji={sectionKanji[group.cuisine]}
                   count={group.items.length}
                 >
-                  {group.items.map((dish) => (
-                    <Row
-                      key={dish.id}
-                      onClick={() => setModalIndex(indexOf(`dish-${dish.id}`))}
-                      img={dish.hasImage ? `/images/dishes/${dish.id}.png` : undefined}
-                      number={dish.id}
-                      name={dish.name}
-                      desc={dish.desc}
-                      price={dish.price}
-                      badges={
-                        <>
-                          {dish.isNew && (
-                            <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
-                              {t.menu.newLabel}
-                            </span>
-                          )}
-                          <DietBadge dish={dish} />
-                          {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
-                        </>
-                      }
-                    />
-                  ))}
+                  {group.items.map((dish) => {
+                    const dl = localizeDish(dish, lang);
+                    return (
+                      <Row
+                        key={dish.id}
+                        onClick={() => setModalIndex(indexOf(`dish-${dish.id}`))}
+                        img={dish.hasImage ? `/images/dishes/${dish.id}.png` : undefined}
+                        number={dish.id}
+                        name={dl.name}
+                        desc={dl.desc}
+                        price={dish.price}
+                        badges={
+                          <>
+                            {dish.isNew && (
+                              <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
+                                {t.menu.newLabel}
+                              </span>
+                            )}
+                            <DietBadge dish={dish} />
+                            {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
+                          </>
+                        }
+                      />
+                    );
+                  })}
                 </Section>
               ))}
 

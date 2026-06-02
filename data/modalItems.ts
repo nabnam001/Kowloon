@@ -1,19 +1,20 @@
 import type { Dish } from "@/data/menu";
-import { CUISINE_LABELS } from "@/data/menu";
+import { CUISINE_LABELS, localizeDish } from "@/data/menu";
 import type { DrinkItem, Wine } from "@/data/drinks";
 import type { ModalItem } from "@/components/ItemModal";
 import type { Lang } from "@/data/i18n";
 
 export function dishToModal(d: Dish, lang: Lang): ModalItem {
+  const loc = localizeDish(d, lang);
   return {
     kind: "dish",
     id: `dish-${d.id}`,
     number: d.id,
     img: d.hasImage ? `/images/dishes/${d.id}.png` : undefined,
     category: CUISINE_LABELS[d.cuisine][lang],
-    name: d.name,
+    name: loc.name,
     price: d.price,
-    desc: d.desc,
+    desc: loc.desc,
     spice: d.spice,
     veg: d.veg,
     vegan: d.vegan,
