@@ -100,6 +100,11 @@ export const translations = {
       dragHint: "Træk for at dreje fadet",
       fullMenu: "Se hele menukortet",
     },
+    marquee: {
+      kicker: "Friske råvarer hver dag",
+      title: "Over 50 retter, tilberedt med kærlighed",
+      label: "Billedbånd med retter",
+    },
     locations: {
       kicker: "Find os",
       title: "To restauranter i Aarhus centrum",
@@ -232,6 +237,11 @@ export const translations = {
       boarding: "Boarding",
       dragHint: "Drag to spin the table",
       fullMenu: "See the full menu",
+    },
+    marquee: {
+      kicker: "Fresh produce every day",
+      title: "Over 50 dishes, crafted with care",
+      label: "Ribbon of dishes",
     },
     locations: {
       kicker: "Find us",
