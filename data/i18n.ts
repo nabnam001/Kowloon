@@ -116,6 +116,14 @@ export const translations = {
     ribbon: {
       words: ["KINA", "THAILAND", "VIETNAM", "AARHUS"],
     },
+    accolades: {
+      kicker: "Anerkendelse & erfaring",
+      elite: "Elite Smiley",
+      years: "år i Aarhus",
+      kitchens: "køkkener",
+      dishes: "retter à la carte",
+      locations: "restauranter",
+    },
     locations: {
       kicker: "Find os",
       title: "To restauranter i Aarhus centrum",
@@ -266,6 +274,14 @@ export const translations = {
     },
     ribbon: {
       words: ["CHINA", "THAILAND", "VIETNAM", "AARHUS"],
+    },
+    accolades: {
+      kicker: "Recognition & experience",
+      elite: "Elite Smiley",
+      years: "years in Aarhus",
+      kitchens: "kitchens",
+      dishes: "à la carte dishes",
+      locations: "restaurants",
     },
     locations: {
       kicker: "Find us",

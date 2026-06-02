@@ -1,8 +1,10 @@
 import { Navbar } from "@/components/Navbar";
 import { Intro } from "@/components/Intro";
 import { ScrollProgress } from "@/components/ScrollProgress";
+import { CustomCursor } from "@/components/CustomCursor";
 import { Hero } from "@/components/Hero";
 import { Highlights } from "@/components/Highlights";
+import { Accolades } from "@/components/Accolades";
 import { Philosophy } from "@/components/Philosophy";
 import { Journey } from "@/components/Journey";
 import { Menu } from "@/components/Menu";
@@ -21,9 +23,11 @@ export default function Home() {
     <>
       <Intro />
       <ScrollProgress />
+      <CustomCursor />
       <Navbar />
       <main id="main">
         <Hero />
+        <Accolades />
         <Highlights />
         <Philosophy />
         <Journey />

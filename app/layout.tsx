@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { LangProvider } from "@/components/LangProvider";
 import { SoundProvider } from "@/components/SoundProvider";
@@ -10,10 +10,11 @@ const inter = Inter({
   display: "swap",
 });
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-display",
   display: "swap",
+  axes: ["SOFT", "WONK", "opsz"],
 });
 
 const SITE_URL = "https://www.kowloon.dk";
@@ -100,7 +101,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="da" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="da" className={`${inter.variable} ${fraunces.variable}`}>
       <body>
         <script
           type="application/ld+json"
