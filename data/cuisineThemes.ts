@@ -17,6 +17,8 @@ export interface CuisineTheme {
   glow: string;
   /** full-bleed background gradient for the scene */
   bg: string;
+  /** position of the destination on the stylised Asia map (viewBox 0 0 400 300) */
+  mapPoint: { x: number; y: number };
   /** curated, photogenic signature dish ids (must have images) */
   signatures: string[];
 }
@@ -39,6 +41,7 @@ export const cuisineThemes: CuisineTheme[] = [
     accentSoft: "#FF6B5E",
     glow: "rgba(226,59,59,0.45)",
     bg: "radial-gradient(ellipse at 30% 20%, rgba(226,59,59,0.28), transparent 55%), radial-gradient(ellipse at 80% 80%, rgba(200,18,46,0.35), transparent 50%), linear-gradient(160deg, #2A0A12 0%, #14060B 60%, #0B0A14 100%)",
+    mapPoint: { x: 248, y: 96 },
     signatures: ["21", "22", "19", "13", "5", "6", "15", "12"],
   },
   {
@@ -58,6 +61,7 @@ export const cuisineThemes: CuisineTheme[] = [
     accentSoft: "#34E0A8",
     glow: "rgba(19,185,129,0.4)",
     bg: "radial-gradient(ellipse at 25% 25%, rgba(19,185,129,0.26), transparent 55%), radial-gradient(ellipse at 80% 75%, rgba(232,184,115,0.28), transparent 50%), linear-gradient(160deg, #06231C 0%, #0A1810 55%, #0B0A14 100%)",
+    mapPoint: { x: 236, y: 150 },
     signatures: ["47", "46", "32", "37", "59", "60", "62", "42"],
   },
   {
@@ -77,6 +81,7 @@ export const cuisineThemes: CuisineTheme[] = [
     accentSoft: "#FFD970",
     glow: "rgba(242,193,78,0.42)",
     bg: "radial-gradient(ellipse at 30% 22%, rgba(242,193,78,0.24), transparent 55%), radial-gradient(ellipse at 78% 78%, rgba(218,38,39,0.3), transparent 50%), linear-gradient(160deg, #241A06 0%, #15100A 55%, #0B0A14 100%)",
+    mapPoint: { x: 262, y: 168 },
     signatures: ["34", "74", "89", "81", "87", "82", "36", "29"],
   },
 ];

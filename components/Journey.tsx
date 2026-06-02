@@ -7,6 +7,7 @@ import { dishes as allDishes, type Dish } from "@/data/menu";
 import { useLang } from "./LangProvider";
 import { DishTurntable } from "./DishTurntable";
 import { DishModal } from "./DishModal";
+import { AsiaMap } from "./AsiaMap";
 
 export function Journey() {
   const { t, lang } = useLang();
@@ -25,6 +26,11 @@ export function Journey() {
   const fly = (next: number) => {
     setDir(next > idx ? 1 : -1);
     setIdx((next + cuisineThemes.length) % cuisineThemes.length);
+  };
+
+  const flyToKey = (key: JourneyKey) => {
+    const next = cuisineThemes.findIndex((c) => c.key === key);
+    if (next >= 0 && next !== idx) fly(next);
   };
 
   return (
@@ -98,6 +104,67 @@ export function Journey() {
 
         {/* The flight scene */}
         <div className="relative mt-12 min-h-[640px]">
+          {/* Map + boarding pass row */}
+          <div className="mb-10 grid items-center gap-8 lg:grid-cols-2">
+            {/* Animated map of Asia (persists across destinations) */}
+            <div className="order-2 lg:order-1">
+              <AsiaMap activeKey={theme.key} onSelect={flyToKey} />
+            </div>
+
+            {/* Boarding pass (swaps per destination) */}
+            <div className="order-1 lg:order-2" style={{ perspective: "1200px" }}>
+              <AnimatePresence mode="wait" custom={dir}>
+                <motion.div
+                  key={`${theme.key}-pass`}
+                  custom={dir}
+                  initial={{ opacity: 0, x: dir * 60, rotateY: dir * 12 }}
+                  animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                  exit={{ opacity: 0, x: dir * -60, rotateY: dir * -12 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-stretch overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl"
+                >
+                  <div
+                    className="flex flex-col justify-center px-5 py-4"
+                    style={{ background: `${theme.accent}22` }}
+                  >
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-cream/50">
+                      {t.journey.boarding}
+                    </span>
+                    <span
+                      className="font-display text-3xl font-bold"
+                      style={{ color: theme.accentSoft }}
+                    >
+                      {theme.code}
+                    </span>
+                  </div>
+                  <div className="flex flex-1 flex-col justify-center px-5 py-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{theme.flag}</span>
+                      <h3 className="heading-display text-xl text-cream">
+                        {theme.country[lang]}
+                      </h3>
+                    </div>
+                    <p
+                      className="mt-0.5 text-xs font-semibold uppercase tracking-wide"
+                      style={{ color: theme.accentSoft }}
+                    >
+                      {theme.tagline[lang]}
+                    </p>
+                    <p className="mt-1.5 text-xs leading-relaxed text-cream/60">
+                      {theme.intro[lang]}
+                    </p>
+                  </div>
+                  {/* perforation */}
+                  <div className="relative w-6 border-l border-dashed border-white/15">
+                    <span className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-ink" />
+                    <span className="absolute -bottom-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-ink" />
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Turntable (swaps per destination) */}
           <AnimatePresence mode="wait" custom={dir}>
             <motion.div
               key={theme.key}
@@ -106,14 +173,12 @@ export function Journey() {
                 enter: (d: number) => ({
                   opacity: 0,
                   x: d * 120,
-                  rotateY: d * 18,
                   scale: 0.92,
                 }),
-                center: { opacity: 1, x: 0, rotateY: 0, scale: 1 },
+                center: { opacity: 1, x: 0, scale: 1 },
                 exit: (d: number) => ({
                   opacity: 0,
                   x: d * -120,
-                  rotateY: d * -18,
                   scale: 0.92,
                 }),
               }}
@@ -121,47 +186,7 @@ export function Journey() {
               animate="center"
               exit="exit"
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              style={{ perspective: "1200px" }}
             >
-              {/* Boarding pass header */}
-              <div className="mx-auto mb-8 flex max-w-lg items-stretch overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-xl">
-                <div
-                  className="flex flex-col justify-center px-5 py-4"
-                  style={{ background: `${theme.accent}22` }}
-                >
-                  <span className="font-mono text-[10px] uppercase tracking-widest text-cream/50">
-                    {t.journey.boarding}
-                  </span>
-                  <span
-                    className="font-display text-3xl font-bold"
-                    style={{ color: theme.accentSoft }}
-                  >
-                    {theme.code}
-                  </span>
-                </div>
-                <div className="flex flex-1 flex-col justify-center px-5 py-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">{theme.flag}</span>
-                    <h3 className="heading-display text-xl text-cream">
-                      {theme.country[lang]}
-                    </h3>
-                  </div>
-                  <p
-                    className="mt-0.5 text-xs font-semibold uppercase tracking-wide"
-                    style={{ color: theme.accentSoft }}
-                  >
-                    {theme.tagline[lang]}
-                  </p>
-                  <p className="mt-1.5 text-xs leading-relaxed text-cream/60">
-                    {theme.intro[lang]}
-                  </p>
-                </div>
-                {/* perforation */}
-                <div className="relative w-6 border-l border-dashed border-white/15">
-                  <span className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-ink" />
-                  <span className="absolute -bottom-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-ink" />
-                </div>
-              </div>
 
               {/* Turntable */}
               <DishTurntable
