@@ -161,6 +161,7 @@ const brandMap = {
   "chilli2.png": "chilli2-removebg-preview.png",
   "chilli3.png": "chilli3-removebg-preview.png",
   "elite-smiley.png": "EliteSmiley.png",
+  "dragon.png": "banegaardsgade/logo_art.png",
   "map-denmark.svg": "banegaardsgade/denmark.svg",
   "map-china.svg": "banegaardsgade/china.svg",
   "map-thailand.svg": "banegaardsgade/thailand.svg",

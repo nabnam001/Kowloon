@@ -6,7 +6,8 @@ import { cuisineThemes, type JourneyKey } from "@/data/cuisineThemes";
 import { dishes as allDishes, type Dish } from "@/data/menu";
 import { useLang } from "./LangProvider";
 import { DishTurntable } from "./DishTurntable";
-import { DishModal } from "./DishModal";
+import { ItemModal } from "./ItemModal";
+import { dishToModal } from "@/data/modalItems";
 import { AsiaMap } from "./AsiaMap";
 import { SceneParticles } from "./SceneParticles";
 import { InkBackdrop } from "./InkBackdrop";
@@ -18,7 +19,7 @@ export function Journey() {
   const { play } = useSound();
   const [idx, setIdx] = useState(0);
   const [dir, setDir] = useState(1);
-  const [selected, setSelected] = useState<Dish | null>(null);
+  const [modalIndex, setModalIndex] = useState<number | null>(null);
 
   const theme = cuisineThemes[idx];
 
@@ -27,6 +28,11 @@ export function Journey() {
       .map((id) => allDishes.find((d) => d.id === id))
       .filter((d): d is Dish => Boolean(d && d.hasImage));
   }, [theme]);
+
+  const modalItems = useMemo(
+    () => sigDishes.map((d) => dishToModal(d, lang)),
+    [sigDishes, lang]
+  );
 
   // keyboard arrows fly between destinations when the section is in view
   const sectionRef = useRef<HTMLElement>(null);
@@ -67,7 +73,8 @@ export function Journey() {
 
   const openDish = (d: Dish) => {
     play("open");
-    setSelected(d);
+    const i = sigDishes.findIndex((s) => s.id === d.id);
+    setModalIndex(i >= 0 ? i : 0);
   };
 
   return (
@@ -271,7 +278,12 @@ export function Journey() {
         </div>
       </div>
 
-      <DishModal dish={selected} onClose={() => setSelected(null)} />
+      <ItemModal
+        items={modalItems}
+        index={modalIndex}
+        onClose={() => setModalIndex(null)}
+        onIndex={setModalIndex}
+      />
     </section>
   );
 }

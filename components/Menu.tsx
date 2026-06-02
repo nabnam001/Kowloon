@@ -7,14 +7,14 @@ import {
   dishesAt,
   CUISINE_LABELS,
   type Cuisine,
-  type Dish,
   type LocationId,
 } from "@/data/menu";
 import { drinks, wines, houseWine } from "@/data/drinks";
 import { locations } from "@/data/site";
 import { useLang } from "./LangProvider";
 import { Reveal } from "./Reveal";
-import { DishModal } from "./DishModal";
+import { ItemModal, type ModalItem } from "./ItemModal";
+import { dishToModal, drinkToModal, wineToModal } from "@/data/modalItems";
 import { DietBadge } from "./DietBadge";
 import { SpiceMeter } from "./SpiceMeter";
 
@@ -30,7 +30,6 @@ const sectionOrder: Cuisine[] = [
   "dessert",
 ];
 
-// Kanji label per section for the Raku-style bilingual header
 const sectionKanji: Record<Cuisine, string> = {
   forret: "前菜",
   kina: "中華",
@@ -46,7 +45,7 @@ export function Menu() {
   const [loc, setLoc] = useState<LocationId>("frederiksgade");
   const [diet, setDiet] = useState<DietFilter>("all");
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<Dish | null>(null);
+  const [modalIndex, setModalIndex] = useState<number | null>(null);
 
   const shopDishes = useMemo(() => dishesAt(loc), [loc]);
   const currentLoc = useMemo(
@@ -75,6 +74,23 @@ export function Menu() {
       .filter((g) => g.items.length > 0);
   }, [filtered]);
 
+  const showExtras = diet === "all" && !query;
+
+  // Flat, ordered list of everything visible — powers the swipeable modal.
+  const modalItems = useMemo<ModalItem[]>(() => {
+    const list: ModalItem[] = [];
+    grouped.forEach((g) => g.items.forEach((d) => list.push(dishToModal(d, lang))));
+    if (showExtras) {
+      drinks.forEach((d) => list.push(drinkToModal(d, t.drinks.tabDrinks)));
+      if (currentLoc?.hasWine) {
+        [houseWine, ...wines].forEach((w) => list.push(wineToModal(w, t.drinks.tabWine)));
+      }
+    }
+    return list;
+  }, [grouped, showExtras, currentLoc, lang, t.drinks.tabDrinks, t.drinks.tabWine]);
+
+  const indexOf = (id: string) => modalItems.findIndex((m) => m.id === id);
+
   const dietChips: { id: DietFilter; label: string }[] = [
     { id: "all", label: t.menu.filters.all },
     { id: "veg", label: t.menu.filters.veg },
@@ -98,43 +114,62 @@ export function Menu() {
           <p className="mt-4 text-cream/60">{t.menu.locationSubtitle}</p>
         </Reveal>
 
-        {/* Location switcher — choose a shop, see what it serves */}
-        <div className="mt-10 flex justify-center">
-          <div className="grid w-full max-w-2xl grid-cols-2 gap-3">
-            {locations.map((l) => {
-              const isActive = l.id === (loc as string);
-              return (
-                <button
-                  key={l.id}
-                  onClick={() => setLoc(l.id as LocationId)}
-                  aria-pressed={isActive}
-                  className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition-all ${
-                    isActive
-                      ? "border-chilli/60 bg-chilli/10"
-                      : "border-cream/12 bg-ink-800/50 hover:border-cream/30"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`h-2 w-2 rounded-full ${
-                        isActive ? "bg-chilli" : "bg-cream/30"
-                      }`}
-                    />
-                    <span className="text-[11px] font-semibold uppercase tracking-widest text-cream/50">
+        {/* Location switcher with shop exterior photos */}
+        <div className="mt-10 grid w-full gap-4 sm:grid-cols-2">
+          {locations.map((l) => {
+            const isActive = l.id === (loc as string);
+            const photo =
+              l.id === "frederiksgade"
+                ? "/images/venue/front.png"
+                : "/images/venue/banegaardsgade-outside.jpg";
+            return (
+              <button
+                key={l.id}
+                onClick={() => {
+                  setLoc(l.id as LocationId);
+                  setDiet("all");
+                  setQuery("");
+                }}
+                aria-pressed={isActive}
+                className={`group relative overflow-hidden rounded-2xl border text-left transition-all ${
+                  isActive
+                    ? "border-chilli/60 ring-1 ring-chilli/40"
+                    : "border-cream/12 hover:border-cream/30"
+                }`}
+              >
+                {/* exterior photo */}
+                <div className="relative h-40 overflow-hidden sm:h-44">
+                  <Image
+                    src={photo}
+                    alt={l.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    className={`object-cover transition-transform duration-700 group-hover:scale-105 ${
+                      isActive ? "" : "grayscale"
+                    }`}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
+                  {isActive && (
+                    <span className="absolute right-4 top-4 rounded-full bg-chilli px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-cream">
+                      {lang === "da" ? "Valgt" : "Selected"}
+                    </span>
+                  )}
+                  <div className="absolute inset-x-0 bottom-0 p-4">
+                    <span className="text-[11px] font-semibold uppercase tracking-widest text-gold">
                       {l.city}
                     </span>
+                    <h3 className="font-display text-xl font-semibold text-cream">
+                      {l.name}
+                    </h3>
+                    <p className="text-xs text-cream/60">{l.address}</p>
                   </div>
-                  <h3 className="mt-1 font-display text-lg font-semibold text-cream">
-                    {l.name}
-                  </h3>
-                  <p className="mt-0.5 text-xs text-cream/50">{l.address}</p>
-                </button>
-              );
-            })}
-          </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Diet chips + search */}
+        {/* Filters + search */}
         <div className="sticky top-[64px] z-30 mx-auto mt-6 max-w-3xl">
           <div className="flex flex-col gap-3 rounded-2xl border border-cream/10 bg-ink-deep/80 p-3 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-2">
@@ -143,12 +178,13 @@ export function Menu() {
                   key={chip.id}
                   onClick={() => setDiet(chip.id)}
                   aria-pressed={diet === chip.id}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
                     diet === chip.id
                       ? "bg-chilli text-cream"
                       : "bg-white/5 text-cream/70 hover:bg-white/10 hover:text-cream"
                   }`}
                 >
+                  <FilterIcon id={chip.id} />
                   {chip.label}
                 </button>
               ))}
@@ -190,202 +226,88 @@ export function Menu() {
           </span>
         </div>
 
-        {/* Menu list grouped by section */}
+        {/* Menu list */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={loc}
+            key={`${loc}-${diet}-${query}`}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35 }}
+            transition={{ duration: 0.3 }}
             className="mx-auto mt-12 max-w-3xl"
           >
             {grouped.map((group) => (
-              <div key={group.cuisine} className="mb-14 scroll-mt-32">
-                {/* bilingual section header */}
-                <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
-                  <div className="flex items-baseline gap-3">
-                    <h3 className="heading-display text-2xl text-cream sm:text-3xl">
-                      {CUISINE_LABELS[group.cuisine][lang]}
-                    </h3>
-                    <span className="font-display text-lg text-cream/35">
-                      {sectionKanji[group.cuisine]}
-                    </span>
-                  </div>
-                  <span className="text-xs uppercase tracking-widest text-cream/35">
-                    {group.items.length}
-                  </span>
-                </div>
-
-                <ul className="divide-y divide-cream/[0.06]">
-                  {group.items.map((dish) => (
-                    <li key={dish.id}>
-                      <button
-                        onClick={() => setSelected(dish)}
-                        className="group flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-cream/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:gap-5 sm:rounded-xl sm:px-3"
-                      >
-                        {/* thumbnail */}
-                        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-ink-700 sm:h-20 sm:w-20">
-                          {dish.hasImage ? (
-                            <Image
-                              src={`/images/dishes/${dish.id}.png`}
-                              alt={dish.name}
-                              fill
-                              sizes="80px"
-                              className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-110"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center text-cream/20">
-                              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                <path d="M3 7a2 2 0 0 1 2-2h2l1-2h8l1 2h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" strokeWidth="1.4" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* text */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono text-[11px] text-cream/35">
-                              {dish.id}
-                            </span>
-                            <h4 className="truncate font-display text-base font-semibold text-cream">
-                              {dish.name}
-                            </h4>
-                            {dish.isNew && (
-                              <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
-                                {t.menu.newLabel}
-                              </span>
-                            )}
-                            <DietBadge dish={dish} />
-                            {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
-                          </div>
-                          {dish.desc && (
-                            <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-cream/55">
-                              {dish.desc}
-                            </p>
-                          )}
-                        </div>
-
-                        {/* price */}
-                        <div className="shrink-0 text-right">
-                          <span className="font-display text-lg font-bold text-gold">
-                            {dish.price},-
+              <Section
+                key={group.cuisine}
+                title={CUISINE_LABELS[group.cuisine][lang]}
+                kanji={sectionKanji[group.cuisine]}
+                count={group.items.length}
+              >
+                {group.items.map((dish) => (
+                  <Row
+                    key={dish.id}
+                    onClick={() => setModalIndex(indexOf(`dish-${dish.id}`))}
+                    img={dish.hasImage ? `/images/dishes/${dish.id}.png` : undefined}
+                    number={dish.id}
+                    name={dish.name}
+                    desc={dish.desc}
+                    price={dish.price}
+                    badges={
+                      <>
+                        {dish.isNew && (
+                          <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
+                            {t.menu.newLabel}
                           </span>
-                        </div>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                        )}
+                        <DietBadge dish={dish} />
+                        {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
+                      </>
+                    }
+                  />
+                ))}
+              </Section>
             ))}
 
-            {/* Drinks section */}
-            {(diet === "all") && !query && (
-              <div className="mb-14 scroll-mt-32">
-                <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
-                  <div className="flex items-baseline gap-3">
-                    <h3 className="heading-display text-2xl text-cream sm:text-3xl">
-                      {t.drinks.tabDrinks}
-                    </h3>
-                    <span className="font-display text-lg text-cream/35">飲み物</span>
-                  </div>
-                </div>
-                <ul className="divide-y divide-cream/[0.06]">
-                  {drinks.map((d) => (
-                    <li key={d.name} className="flex items-center gap-4 py-4 sm:gap-5 sm:px-3">
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-ink-700 sm:h-20 sm:w-20">
-                        {d.img && (
-                          <Image
-                            src={`/images/drinks/${d.img}.png`}
-                            alt={d.name}
-                            fill
-                            sizes="80px"
-                            className="object-contain p-1.5"
-                          />
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <h4 className="font-display text-base font-semibold text-cream">
-                            {d.name}
-                          </h4>
-                          {d.price && (
-                            <span className="shrink-0 font-display text-lg font-bold text-gold">
-                              {d.price},-
-                            </span>
-                          )}
-                        </div>
-                        {d.options && (
-                          <p className="mt-1 text-sm text-cream/55">
-                            {d.options.join(" · ")}
-                          </p>
-                        )}
-                        {d.lines && (
-                          <ul className="mt-1 space-y-0.5">
-                            {d.lines.map((l) => (
-                              <li key={l.label} className="flex justify-between text-sm text-cream/55">
-                                <span>{l.label}</span>
-                                <span className="text-cream/80">{l.price},-</span>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {/* Drinks */}
+            {showExtras && (
+              <Section title={t.drinks.tabDrinks} kanji="飲み物" count={drinks.length}>
+                {drinks.map((d) => (
+                  <Row
+                    key={d.name}
+                    onClick={() => setModalIndex(indexOf(`drink-${d.name}`))}
+                    img={d.img ? `/images/drinks/${d.img}.png` : undefined}
+                    name={d.name}
+                    desc={
+                      d.options
+                        ? d.options.join(" · ")
+                        : d.lines?.map((l) => `${l.label} ${l.price},-`).join(" · ")
+                    }
+                    price={d.price}
+                  />
+                ))}
+              </Section>
             )}
 
-            {/* Wine section — Frederiksgade only */}
-            {currentLoc?.hasWine && diet === "all" && !query && (
-              <div className="mb-14 scroll-mt-32">
-                <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
-                  <div className="flex items-baseline gap-3">
-                    <h3 className="heading-display text-2xl text-cream sm:text-3xl">
-                      {t.drinks.tabWine}
-                    </h3>
-                    <span className="font-display text-lg text-cream/35">ワイン</span>
-                  </div>
-                  <span className="text-xs uppercase tracking-widest text-cream/35">
-                    {wines.length + 1}
-                  </span>
-                </div>
-                <ul className="divide-y divide-cream/[0.06]">
-                  {[houseWine, ...wines].map((w) => (
-                    <li key={w.id} className="flex items-center gap-4 py-4 sm:gap-5 sm:px-3">
-                      <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg bg-ink-700 sm:h-20 sm:w-14">
-                        {w.img ? (
-                          <Image
-                            src={`/images/wine/${w.img}.${w.ext ?? "png"}`}
-                            alt={w.name}
-                            fill
-                            sizes="56px"
-                            className="object-contain p-1"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center text-xl">🍷</div>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <h4 className="font-display text-base font-semibold text-cream">
-                            {w.name}
-                          </h4>
-                          <span className="shrink-0 font-display text-lg font-bold text-gold">
-                            {w.price},-
-                          </span>
-                        </div>
-                        <p className="mt-0.5 text-xs uppercase tracking-wide text-chilli/80">
-                          {w.type}
-                        </p>
-                        <p className="mt-1 line-clamp-2 text-sm text-cream/55">{w.desc}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            {/* Wine — Frederiksgade only */}
+            {showExtras && currentLoc?.hasWine && (
+              <Section title={t.drinks.tabWine} kanji="ワイン" count={wines.length + 1}>
+                {[houseWine, ...wines].map((w) => (
+                  <Row
+                    key={w.id}
+                    onClick={() => setModalIndex(indexOf(`wine-${w.id}`))}
+                    img={w.img ? `/images/wine/${w.img}.${w.ext ?? "png"}` : undefined}
+                    narrow
+                    name={w.name}
+                    desc={w.desc}
+                    price={w.price}
+                    badges={
+                      <span className="text-[10px] uppercase tracking-wide text-chilli/80">
+                        {w.type}
+                      </span>
+                    }
+                  />
+                ))}
+              </Section>
             )}
           </motion.div>
         </AnimatePresence>
@@ -395,7 +317,132 @@ export function Menu() {
         )}
       </div>
 
-      <DishModal dish={selected} onClose={() => setSelected(null)} />
+      <ItemModal
+        items={modalItems}
+        index={modalIndex}
+        onClose={() => setModalIndex(null)}
+        onIndex={setModalIndex}
+      />
     </section>
+  );
+}
+
+function Section({
+  title,
+  kanji,
+  count,
+  children,
+}: {
+  title: string;
+  kanji: string;
+  count: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mb-14 scroll-mt-32">
+      <div className="mb-6 flex items-end justify-between gap-4 border-b border-cream/10 pb-3">
+        <div className="flex items-baseline gap-3">
+          <h3 className="heading-display text-2xl text-cream sm:text-3xl">{title}</h3>
+          <span className="font-display text-lg text-cream/35">{kanji}</span>
+        </div>
+        <span className="text-xs uppercase tracking-widest text-cream/35">{count}</span>
+      </div>
+      <ul className="divide-y divide-cream/[0.06]">{children}</ul>
+    </div>
+  );
+}
+
+function Row({
+  onClick,
+  img,
+  number,
+  name,
+  desc,
+  price,
+  badges,
+  narrow,
+}: {
+  onClick: () => void;
+  img?: string;
+  number?: string;
+  name: string;
+  desc?: string;
+  price?: number;
+  badges?: React.ReactNode;
+  narrow?: boolean;
+}) {
+  return (
+    <li>
+      <button
+        onClick={onClick}
+        className="group flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-cream/[0.03] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold sm:gap-5 sm:rounded-xl sm:px-3"
+      >
+        <div
+          className={`relative h-16 shrink-0 overflow-hidden rounded-xl bg-ink-700 sm:h-20 ${
+            narrow ? "w-12 sm:w-14" : "w-16 sm:w-20"
+          }`}
+        >
+          {img ? (
+            <Image
+              src={img}
+              alt={name}
+              fill
+              sizes="80px"
+              className="object-contain p-1.5 transition-transform duration-500 group-hover:scale-110"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-cream/20">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M3 7a2 2 0 0 1 2-2h2l1-2h8l1 2h2a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" stroke="currentColor" strokeWidth="1.4" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            {number && <span className="font-mono text-[11px] text-cream/35">{number}</span>}
+            <h4 className="font-display text-base font-semibold text-cream">{name}</h4>
+            {badges}
+          </div>
+          {desc && (
+            <p className="mt-1 line-clamp-2 text-sm leading-relaxed text-cream/55">{desc}</p>
+          )}
+        </div>
+
+        {price != null && (
+          <div className="shrink-0 text-right">
+            <span className="font-display text-lg font-bold text-gold">{price},-</span>
+          </div>
+        )}
+      </button>
+    </li>
+  );
+}
+
+function FilterIcon({ id }: { id: DietFilter }) {
+  const common = { width: 13, height: 13, viewBox: "0 0 24 24", fill: "none" as const };
+  if (id === "veg" || id === "vegan")
+    return (
+      <svg {...common}>
+        <path d="M5 19c0-7 5-12 14-13 0 9-5 14-12 14-1 0-2 0-2-1Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      </svg>
+    );
+  if (id === "spicy")
+    return (
+      <svg {...common}>
+        <path d="M8 20c6 0 10-5 10-11 0-1 1-3 2-4-3 0-4 2-5 3-2-2-5-2-7 0 2 0 3 1 3 3-3 1-5 4-3 9Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      </svg>
+    );
+  if (id === "new")
+    return (
+      <svg {...common}>
+        <path d="m12 3 2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+      </svg>
+    );
+  return (
+    <svg {...common}>
+      <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
   );
 }

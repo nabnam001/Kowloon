@@ -67,6 +67,7 @@ export const translations = {
       close: "Luk",
       prev: "Forrige ret",
       nextDish: "Næste ret",
+      swipeHint: "Stryg eller brug pilene",
       count: (n: number) => `${n} retter`,
     },
     deals: {
@@ -229,6 +230,7 @@ export const translations = {
       close: "Close",
       prev: "Previous dish",
       nextDish: "Next dish",
+      swipeHint: "Swipe or use the arrows",
       count: (n: number) => `${n} dishes`,
     },
     deals: {

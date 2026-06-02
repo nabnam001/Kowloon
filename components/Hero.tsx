@@ -71,37 +71,36 @@ export function Hero() {
         <SmokeOverlay opacity={0.18} />
       </motion.div>
 
-      {/* Hero signature dish (mono ink halo + steam) */}
+      {/* Hero dragon (mono ink halo + smoke) */}
       <motion.div
         style={{ y: reduce ? 0 : dishY, x: reduce ? 0 : dishX }}
-        className="pointer-events-none absolute right-[-6%] top-1/2 -z-10 hidden -translate-y-1/2 lg:block"
+        className="pointer-events-none absolute right-[2%] top-[34%] -z-10 hidden -translate-y-1/2 lg:block"
       >
         <motion.div
           style={{ rotateX: reduce ? 0 : dishTilt }}
-          className="relative h-[38rem] w-[38rem]"
+          className="relative h-[20rem] w-[20rem]"
         >
           {/* soft ink halo (mono) */}
           <div
-            className="absolute inset-12 rounded-full"
+            className="absolute inset-6 rounded-full"
             style={{
               background:
-                "radial-gradient(circle at 50% 45%, rgba(236,230,218,0.10), rgba(178,58,46,0.06) 45%, transparent 70%)",
-              filter: "blur(30px)",
+                "radial-gradient(circle at 50% 45%, rgba(236,230,218,0.10), rgba(178,58,46,0.08) 45%, transparent 70%)",
+              filter: "blur(28px)",
             }}
           />
-          <div className="absolute bottom-16 left-1/2 h-6 w-[55%] -translate-x-1/2 rounded-[100%] bg-black/60 blur-xl" />
-          <Steam className="left-1/2 top-[20%] -translate-x-1/2" count={4} />
+          <Steam className="left-1/2 top-[20%] -translate-x-1/2" count={3} />
           <motion.div
-            animate={reduce ? undefined : { y: [0, -14, 0] }}
+            animate={reduce ? undefined : { y: [0, -12, 0] }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
             className="relative h-full w-full"
           >
             <Image
-              src="/images/dishes/47.png"
+              src="/brand/dragon.png"
               alt=""
               fill
               priority
-              className="object-contain drop-shadow-[0_30px_70px_rgba(0,0,0,0.75)]"
+              className="object-contain drop-shadow-[0_20px_44px_rgba(0,0,0,0.7)]"
             />
           </motion.div>
         </motion.div>
