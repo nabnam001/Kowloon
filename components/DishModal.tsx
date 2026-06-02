@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 import type { Dish } from "@/data/menu";
 import { CUISINE_LABELS } from "@/data/menu";
@@ -16,6 +16,7 @@ export function DishModal({
   onClose: () => void;
 }) {
   const { t, lang } = useLang();
+  const reduce = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -44,34 +45,68 @@ export function DishModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] flex items-end justify-center p-0 sm:items-center sm:p-6"
+          className="fixed inset-0 z-[120] flex items-end justify-center p-0 sm:items-center sm:p-6"
           role="dialog"
           aria-modal="true"
           aria-label={dish.name}
         >
           <div
-            className="absolute inset-0 bg-ink/80 backdrop-blur-md"
+            className="absolute inset-0 bg-ink/85 backdrop-blur-md"
             onClick={onClose}
           />
           <motion.div
-            initial={{ y: 60, opacity: 0, scale: 0.98 }}
+            initial={{ y: 60, opacity: 0, scale: 0.97 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 60, opacity: 0, scale: 0.98 }}
+            exit={{ y: 60, opacity: 0, scale: 0.97 }}
             transition={{ type: "spring", damping: 30, stiffness: 280 }}
-            className="relative z-10 w-full max-w-lg overflow-hidden rounded-t-3xl border border-white/10 bg-ink-800 shadow-2xl sm:rounded-3xl"
+            className="relative z-10 w-full max-w-lg overflow-hidden rounded-t-3xl border border-white/10 bg-gradient-to-b from-ink-700 to-ink-800 shadow-2xl sm:rounded-3xl"
           >
-            <div className="relative h-60 overflow-hidden bg-gradient-to-br from-indigo-deep to-ink">
+            {/* Hero plate stage */}
+            <div className="relative h-72 overflow-hidden">
+              {/* ambient backdrop */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_30%,rgba(44,34,118,0.6),transparent_70%)]" />
+              {/* oversized dish-number watermark */}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -right-4 -top-8 select-none font-display text-[10rem] font-bold leading-none text-white/[0.04]"
+              >
+                {dish.id}
+              </span>
+
               {dish.hasImage ? (
-                <Image
-                  src={`/images/dishes/${dish.id}.png`}
-                  alt={dish.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 512px"
-                  className="object-contain p-6"
-                />
+                <div className="relative flex h-full items-center justify-center">
+                  {/* rotating halo */}
+                  <motion.div
+                    className="absolute h-52 w-52 rounded-full"
+                    style={{
+                      background:
+                        "conic-gradient(from 0deg, rgba(221,38,39,0.35), rgba(232,184,115,0.3), rgba(44,34,118,0.35), rgba(221,38,39,0.35))",
+                      filter: "blur(28px)",
+                    }}
+                    animate={reduce ? undefined : { rotate: 360 }}
+                    transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+                  />
+                  {/* steam */}
+                  {!reduce && <Steam />}
+                  {/* floating dish */}
+                  <motion.div
+                    animate={reduce ? undefined : { y: [0, -10, 0] }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    className="relative h-56 w-56"
+                  >
+                    <Image
+                      src={`/images/dishes/${dish.id}.png`}
+                      alt={dish.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 512px"
+                      className="object-contain drop-shadow-[0_20px_40px_rgba(0,0,0,0.6)]"
+                    />
+                  </motion.div>
+                </div>
               ) : (
                 <Placeholder label={t.menu.noImage} />
               )}
+
               <div className="absolute left-5 top-5 flex items-center gap-2">
                 <span className="rounded-full bg-chilli px-3 py-1 text-sm font-bold text-white shadow-lg">
                   #{dish.id}
@@ -97,6 +132,9 @@ export function DishModal({
                   />
                 </svg>
               </button>
+
+              {/* fade into content */}
+              <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-ink-800 to-transparent" />
             </div>
 
             <div className="p-6">
@@ -109,7 +147,7 @@ export function DishModal({
                     {dish.name}
                   </h3>
                 </div>
-                <span className="shrink-0 font-display text-2xl font-bold text-gold">
+                <span className="shrink-0 font-display text-2xl font-bold text-gold-grad">
                   {dish.price},-
                 </span>
               </div>
@@ -149,6 +187,27 @@ export function DishModal({
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function Steam() {
+  return (
+    <div className="pointer-events-none absolute left-1/2 top-10 -translate-x-1/2" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          className="absolute block h-20 w-2 rounded-full bg-white/20 blur-md"
+          style={{ left: (i - 1) * 22 }}
+          animate={{ opacity: [0, 0.5, 0], y: [-6, -70], scaleX: [1, 1.7] }}
+          transition={{
+            duration: 3.5,
+            repeat: Infinity,
+            delay: i * 0.8,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+    </div>
   );
 }
 
