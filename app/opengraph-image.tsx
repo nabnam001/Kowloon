@@ -17,35 +17,37 @@ export default function OpengraphImage() {
           justifyContent: "center",
           padding: "80px",
           background:
-            "linear-gradient(135deg, #1A153F 0%, #2C2276 55%, #0B0A14 100%)",
+            "radial-gradient(ellipse at 78% 18%, rgba(178,58,46,0.30), transparent 55%), linear-gradient(135deg, #131315 0%, #0B0B0C 60%, #060607 100%)",
           position: "relative",
         }}
       >
+        {/* faint kanji watermark */}
         <div
           style={{
             position: "absolute",
-            top: -160,
-            right: -120,
-            width: 520,
-            height: 520,
-            borderRadius: 9999,
-            background: "rgba(221,38,39,0.35)",
-            filter: "blur(40px)",
+            right: -40,
+            bottom: -120,
+            fontSize: 460,
+            fontWeight: 800,
+            color: "rgba(236,230,218,0.05)",
             display: "flex",
+            lineHeight: 1,
           }}
-        />
+        >
+          味
+        </div>
         <div
           style={{
             display: "flex",
             alignItems: "center",
             gap: 18,
-            color: "#E8B873",
+            color: "#B23A2E",
             fontSize: 30,
             letterSpacing: 6,
             textTransform: "uppercase",
           }}
         >
-          <div style={{ width: 60, height: 3, background: "#E8B873", display: "flex" }} />
+          <div style={{ width: 60, height: 3, background: "#B23A2E", display: "flex" }} />
           Aarhus · siden 1999
         </div>
         <div
@@ -53,7 +55,7 @@ export default function OpengraphImage() {
             display: "flex",
             fontSize: 110,
             fontWeight: 800,
-            color: "#F7F1E6",
+            color: "#ECE6DA",
             marginTop: 24,
             lineHeight: 1,
           }}
@@ -64,7 +66,7 @@ export default function OpengraphImage() {
           style={{
             display: "flex",
             fontSize: 44,
-            color: "#F2D6A8",
+            color: "rgba(236,230,218,0.85)",
             marginTop: 28,
             maxWidth: 900,
           }}
@@ -75,7 +77,7 @@ export default function OpengraphImage() {
           style={{
             display: "flex",
             fontSize: 28,
-            color: "rgba(247,241,230,0.7)",
+            color: "rgba(236,230,218,0.6)",
             marginTop: 40,
           }}
         >

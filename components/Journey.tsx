@@ -149,7 +149,7 @@ export function Journey() {
                   onClick={() => fly(i)}
                   aria-pressed={isActive}
                   className="relative flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors"
-                  style={{ color: isActive ? "#0B0A14" : "rgba(247,241,230,0.7)" }}
+                  style={{ color: isActive ? "#0B0B0C" : "rgba(236,230,218,0.7)" }}
                 >
                   {isActive && (
                     <motion.span

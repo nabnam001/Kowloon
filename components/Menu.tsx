@@ -10,7 +10,7 @@ import {
   type Cuisine,
   type LocationId,
 } from "@/data/menu";
-import { drinks, wines, houseWine } from "@/data/drinks";
+import { drinks, wines, houseWine, localizeDrink, localizeWine } from "@/data/drinks";
 import { locations } from "@/data/site";
 import { useLang } from "./LangProvider";
 import { Reveal } from "./Reveal";
@@ -130,9 +130,9 @@ export function Menu() {
     const list: ModalItem[] = [];
     grouped.forEach((g) => g.items.forEach((d) => list.push(dishToModal(d, lang))));
     if (showExtras) {
-      drinks.forEach((d) => list.push(drinkToModal(d, t.drinks.tabDrinks)));
+      drinks.forEach((d) => list.push(drinkToModal(d, t.drinks.tabDrinks, lang)));
       if (currentLoc?.hasWine) {
-        [houseWine, ...wines].forEach((w) => list.push(wineToModal(w, t.drinks.tabWine)));
+        [houseWine, ...wines].forEach((w) => list.push(wineToModal(w, t.drinks.tabWine, lang)));
       }
     }
     return list;
@@ -374,42 +374,48 @@ export function Menu() {
               {/* Drinks */}
               {showExtras && (
                 <Section id="sec-drinks" title={t.drinks.tabDrinks} kanji="飲み物" count={drinks.length}>
-                  {drinks.map((d) => (
-                    <Row
-                      key={d.name}
-                      onClick={() => setModalIndex(indexOf(`drink-${d.name}`))}
-                      img={d.img ? `/images/drinks/${d.img}.png` : undefined}
-                      name={d.name}
-                      desc={
-                        d.options
-                          ? d.options.join(" · ")
-                          : d.lines?.map((l) => `${l.label} ${l.price},-`).join(" · ")
-                      }
-                      price={d.price}
-                    />
-                  ))}
+                  {drinks.map((d) => {
+                    const dl = localizeDrink(d, lang);
+                    return (
+                      <Row
+                        key={d.name}
+                        onClick={() => setModalIndex(indexOf(`drink-${d.name}`))}
+                        img={d.img ? `/images/drinks/${d.img}.png` : undefined}
+                        name={dl.name}
+                        desc={
+                          dl.options
+                            ? dl.options.join(" · ")
+                            : dl.lines?.map((l) => `${l.label} ${l.price},-`).join(" · ")
+                        }
+                        price={d.price}
+                      />
+                    );
+                  })}
                 </Section>
               )}
 
               {/* Wine — Frederiksgade only */}
               {showExtras && currentLoc?.hasWine && (
                 <Section id="sec-wine" title={t.drinks.tabWine} kanji="ワイン" count={wines.length + 1}>
-                  {[houseWine, ...wines].map((w) => (
-                    <Row
-                      key={w.id}
-                      onClick={() => setModalIndex(indexOf(`wine-${w.id}`))}
-                      img={w.img ? `/images/wine/${w.img}.${w.ext ?? "png"}` : undefined}
-                      narrow
-                      name={w.name}
-                      desc={w.desc}
-                      price={w.price}
-                      badges={
-                        <span className="text-[10px] uppercase tracking-wide text-chilli/80">
-                          {w.type}
-                        </span>
-                      }
-                    />
-                  ))}
+                  {[houseWine, ...wines].map((w) => {
+                    const wl = localizeWine(w, lang);
+                    return (
+                      <Row
+                        key={w.id}
+                        onClick={() => setModalIndex(indexOf(`wine-${w.id}`))}
+                        img={w.img ? `/images/wine/${w.img}.${w.ext ?? "png"}` : undefined}
+                        narrow
+                        name={wl.name}
+                        desc={wl.desc}
+                        price={w.price}
+                        badges={
+                          <span className="text-[10px] uppercase tracking-wide text-chilli/80">
+                            {wl.type}
+                          </span>
+                        }
+                      />
+                    );
+                  })}
                 </Section>
               )}
 
