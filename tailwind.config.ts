@@ -21,6 +21,12 @@ const config: Config = {
           dark: "#8C2A20",
           glow: "#C2453A",
         },
+        // Muted sage — the ONLY green, desaturated to live in the ink palette.
+        // Used purely for the vegetarian/vegan affordance.
+        sage: {
+          DEFAULT: "#9CAE90",
+          soft: "#B7C4AE",
+        },
         gold: {
           DEFAULT: "#BCB2A0", // warm stone (elegant mono accent)
           soft: "#D8D0C0",

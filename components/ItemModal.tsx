@@ -10,6 +10,7 @@ import {
 import { useCallback, useEffect, useRef } from "react";
 import { useLang } from "./LangProvider";
 import { SpiceMeter } from "./SpiceMeter";
+import { LeafIcon, StarIcon } from "./DietBadge";
 import { Steam } from "./Steam";
 
 /** A normalized item the modal can display (dish, drink or wine). */
@@ -26,6 +27,7 @@ export interface ModalItem {
   veg?: boolean;
   vegan?: boolean;
   isNew?: boolean;
+  popular?: boolean;
   allergens?: string;
   options?: string[]; // for drinks
   type?: string; // wine type
@@ -187,6 +189,11 @@ export function ItemModal({
                     #{item.number}
                   </span>
                 )}
+                {item.popular && (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-chilli/50 bg-chilli/20 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cream shadow">
+                    <StarIcon size={11} />
+                  </span>
+                )}
                 {item.isNew && (
                   <span className="rounded-full bg-cream px-3 py-1 text-xs font-bold uppercase tracking-wide text-ink">
                     {t.menu.newLabel}
@@ -253,12 +260,14 @@ export function ItemModal({
                     </span>
                   ) : null}
                   {item.veg && (
-                    <span className="rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-300">
-                      🌱 {t.menu.vegLabel}
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-sage/40 bg-sage/10 px-3 py-1.5 text-xs font-medium text-sage">
+                      <LeafIcon size={12} />
+                      {t.menu.vegLabel}
                     </span>
                   )}
                   {item.vegan && (
-                    <span className="rounded-full bg-emerald-500/15 px-3 py-1.5 text-xs font-medium text-emerald-300">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-sage/40 bg-sage/10 px-3 py-1.5 text-xs font-medium text-sage">
+                      <LeafIcon size={12} />
                       {t.menu.veganLabel}
                     </span>
                   )}

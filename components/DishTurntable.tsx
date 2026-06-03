@@ -13,6 +13,7 @@ import { SpiceMeter } from "./SpiceMeter";
 import { DietBadge } from "./DietBadge";
 import { Steam } from "./Steam";
 import { useLang } from "./LangProvider";
+import { useInViewport } from "./useInViewport";
 
 /**
  * A clean "coverflow" presenter of signature dishes. One large center dish
@@ -35,6 +36,7 @@ export function DishTurntable({
   const { t } = useLang();
   const reduce = useReducedMotion();
   const count = dishes.length;
+  const { ref: stageRef, inView } = useInViewport<HTMLDivElement>("0px");
 
   const [active, setActive] = useState(0);
   const interactedRef = useRef(false);
@@ -52,15 +54,15 @@ export function DishTurntable({
     setActive(0);
   }, [dishes]);
 
-  // gentle auto-advance until interaction
+  // gentle auto-advance until interaction — only while on-screen
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !inView) return;
     const id = window.setInterval(() => {
       if (interactedRef.current) return;
       setActive((a) => (a + 1) % count);
     }, 3200);
     return () => window.clearInterval(id);
-  }, [reduce, count]);
+  }, [reduce, count, inView]);
 
   const mark = () => {
     interactedRef.current = true;
@@ -94,6 +96,7 @@ export function DishTurntable({
     <div className="flex w-full flex-col items-center">
       {/* Stage */}
       <motion.div
+        ref={stageRef}
         className="relative h-[280px] w-full max-w-3xl cursor-grab touch-pan-y select-none active:cursor-grabbing sm:h-[340px]"
         drag="x"
         dragConstraints={{ left: 0, right: 0 }}

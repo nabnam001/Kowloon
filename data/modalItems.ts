@@ -20,6 +20,7 @@ export function dishToModal(d: Dish, lang: Lang): ModalItem {
     veg: d.veg,
     vegan: d.vegan,
     isNew: d.isNew,
+    popular: d.popular,
     allergens: d.allergens,
   };
 }

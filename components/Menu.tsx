@@ -16,10 +16,10 @@ import { useLang } from "./LangProvider";
 import { Reveal } from "./Reveal";
 import { ItemModal, type ModalItem } from "./ItemModal";
 import { dishToModal, drinkToModal, wineToModal } from "@/data/modalItems";
-import { DietBadge } from "./DietBadge";
+import { DietBadge, StarIcon, PopularBadge } from "./DietBadge";
 import { SpiceMeter } from "./SpiceMeter";
 
-type DietFilter = "all" | "veg" | "vegan" | "new" | "spicy";
+type DietFilter = "all" | "popular" | "veg" | "vegan" | "new" | "spicy";
 
 const sectionOrder: Cuisine[] = [
   "forret",
@@ -57,6 +57,7 @@ export function Menu() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return shopDishes.filter((d) => {
+      if (diet === "popular" && !d.popular) return false;
       if (diet === "veg" && !d.veg) return false;
       if (diet === "vegan" && !d.vegan) return false;
       if (diet === "new" && !d.isNew) return false;
@@ -142,6 +143,7 @@ export function Menu() {
 
   const dietChips: { id: DietFilter; label: string }[] = [
     { id: "all", label: t.menu.filters.all },
+    { id: "popular", label: t.menu.filters.popular },
     { id: "veg", label: t.menu.filters.veg },
     { id: "vegan", label: t.menu.filters.vegan },
     { id: "new", label: t.menu.filters.new },
@@ -227,10 +229,10 @@ export function Menu() {
                   key={chip.id}
                   onClick={() => setDiet(chip.id)}
                   aria-pressed={diet === chip.id}
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold ${
                     diet === chip.id
-                      ? "bg-chilli text-cream"
-                      : "bg-white/5 text-cream/70 hover:bg-white/10 hover:text-cream"
+                      ? "border-chilli bg-chilli text-white"
+                      : "border-cream/15 bg-white/[0.04] text-cream/75 hover:border-cream/35 hover:bg-white/10 hover:text-cream"
                   }`}
                 >
                   <FilterIcon id={chip.id} />
@@ -261,13 +263,19 @@ export function Menu() {
         </div>
 
         {/* legend */}
-        <div className="mx-auto mt-5 flex max-w-3xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-cream/45">
+        <div className="mx-auto mt-5 flex max-w-3xl flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] text-cream/55">
           <span className="inline-flex items-center gap-1.5">
-            <span className="inline-flex h-4 items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 text-emerald-300">V</span>
+            <span className="inline-flex h-4 items-center gap-0.5 rounded-full border border-chilli/50 bg-chilli/15 px-1.5 text-chilli-glow">
+              <StarIcon size={9} />
+            </span>
+            {t.menu.popularLabel}
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-flex h-4 items-center rounded-full border border-sage/40 bg-sage/10 px-1.5 text-sage">V</span>
             {t.menu.vegLabel}
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span className="inline-flex h-4 items-center rounded-full border border-emerald-400/30 bg-emerald-400/10 px-1.5 text-emerald-300">VG</span>
+            <span className="inline-flex h-4 items-center rounded-full border border-sage/40 bg-sage/10 px-1.5 text-sage">VG</span>
             {t.menu.veganLabel}
           </span>
           <span className="inline-flex items-center gap-1.5">
@@ -356,6 +364,7 @@ export function Menu() {
                         price={dish.price}
                         badges={
                           <>
+                            {dish.popular && <PopularBadge />}
                             {dish.isNew && (
                               <span className="rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-ink">
                                 {t.menu.newLabel}
@@ -365,6 +374,7 @@ export function Menu() {
                             {dish.spice ? <SpiceMeter level={dish.spice} /> : null}
                           </>
                         }
+                        favorite={dish.popular}
                       />
                     );
                   })}
@@ -473,6 +483,7 @@ function Row({
   price,
   badges,
   narrow,
+  favorite,
 }: {
   onClick: () => void;
   img?: string;
@@ -482,6 +493,7 @@ function Row({
   price?: number;
   badges?: React.ReactNode;
   narrow?: boolean;
+  favorite?: boolean;
 }) {
   return (
     <li>
@@ -509,6 +521,14 @@ function Row({
               </svg>
             </div>
           )}
+          {favorite && (
+            <span
+              className="absolute left-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-chilli text-cream shadow"
+              aria-hidden="true"
+            >
+              <StarIcon size={8} />
+            </span>
+          )}
         </div>
 
         <div className="min-w-0 flex-1">
@@ -534,10 +554,17 @@ function Row({
 
 function FilterIcon({ id }: { id: DietFilter }) {
   const common = { width: 13, height: 13, viewBox: "0 0 24 24", fill: "none" as const };
+  if (id === "popular")
+    return (
+      <svg width={13} height={13} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="m12 3 2.6 5.7 6.2.6-4.7 4.1 1.4 6.1L12 16.9 6.5 19.6l1.4-6.1L3.2 9.3l6.2-.6L12 3Z" />
+      </svg>
+    );
   if (id === "veg" || id === "vegan")
     return (
       <svg {...common}>
         <path d="M5 19c0-7 5-12 14-13 0 9-5 14-12 14-1 0-2 0-2-1Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M9 15c2-2 4-3 7-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     );
   if (id === "spicy")
@@ -549,7 +576,7 @@ function FilterIcon({ id }: { id: DietFilter }) {
   if (id === "new")
     return (
       <svg {...common}>
-        <path d="m12 3 2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5L12 3Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+        <path d="M12 3v4M12 17v4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M3 12h4M17 12h4M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
       </svg>
     );
   return (

@@ -71,14 +71,15 @@ export function Hero() {
         <SmokeOverlay opacity={0.18} />
       </motion.div>
 
-      {/* Hero dragon (mono ink halo + smoke) */}
+      {/* Hero dragon (mono ink halo + smoke) — visible on every screen,
+          sitting behind the text as an atmospheric element on mobile. */}
       <motion.div
         style={{ y: reduce ? 0 : dishY, x: reduce ? 0 : dishX }}
-        className="pointer-events-none absolute right-[2%] top-[34%] -z-10 hidden -translate-y-1/2 lg:block"
+        className="pointer-events-none absolute -right-16 top-[14%] -z-10 opacity-40 sm:-right-6 sm:opacity-60 lg:right-[2%] lg:top-[34%] lg:-translate-y-1/2 lg:opacity-100"
       >
         <motion.div
           style={{ rotateX: reduce ? 0 : dishTilt }}
-          className="relative h-[20rem] w-[20rem]"
+          className="relative h-56 w-56 sm:h-72 sm:w-72 lg:h-[20rem] lg:w-[20rem]"
         >
           {/* soft ink halo (mono) */}
           <div
@@ -187,23 +188,37 @@ export function Hero() {
         </div>
       </motion.div>
 
-      {/* Scroll cue */}
+      {/* Scroll cue — a refined chevron, not a mouse shape */}
       <motion.div
         style={{ opacity }}
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2"
+        className="absolute bottom-7 left-1/2 z-10 -translate-x-1/2"
       >
-        <div className="flex flex-col items-center gap-2 text-cream/50">
-          <span className="text-[10px] uppercase tracking-[0.3em]">
+        <a
+          href="#menu"
+          aria-label={t.hero.scroll}
+          className="group flex flex-col items-center gap-2 text-cream/45 transition-colors hover:text-cream/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-ink rounded-full p-1"
+        >
+          <span className="text-[10px] uppercase tracking-[0.35em]">
             {t.hero.scroll}
           </span>
-          <motion.span
-            animate={reduce ? undefined : { y: [0, 8, 0] }}
-            transition={{ duration: 1.6, repeat: Infinity }}
-            className="flex h-9 w-5 items-start justify-center rounded-full border border-cream/30 p-1"
+          <motion.svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            animate={reduce ? undefined : { y: [0, 5, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           >
-            <span className="h-2 w-1 rounded-full bg-chilli" />
-          </motion.span>
-        </div>
+            <path
+              d="M6 9l6 6 6-6"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </motion.svg>
+        </a>
       </motion.div>
 
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-ink to-transparent" />

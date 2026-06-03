@@ -2,15 +2,17 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import { useLang } from "./LangProvider";
+import { useInViewport } from "./useInViewport";
 
 /**
  * An oversized kinetic wordmark ribbon — a hallmark of bold, award-winning
  * restaurant sites. Big outlined display type scrolls horizontally, with the
- * brand words alternating filled and outlined for rhythm.
+ * brand words alternating filled and outlined for rhythm. Pauses off-screen.
  */
 export function KineticRibbon() {
   const { t } = useLang();
   const reduce = useReducedMotion();
+  const { ref, inView } = useInViewport<HTMLElement>("100px");
   const words = t.ribbon.words;
 
   // build a long enough sequence to loop seamlessly
@@ -18,6 +20,7 @@ export function KineticRibbon() {
 
   return (
     <section
+      ref={ref}
       aria-hidden="true"
       className="relative overflow-hidden border-y border-white/5 bg-ink py-8 sm:py-12"
     >
@@ -28,7 +31,7 @@ export function KineticRibbon() {
       />
       <motion.div
         className="relative flex w-max items-center gap-8 whitespace-nowrap will-change-transform"
-        animate={reduce ? undefined : { x: ["0%", "-50%"] }}
+        animate={!reduce && inView ? { x: ["0%", "-50%"] } : undefined}
         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
       >
         {sequence.map((word, i) => (

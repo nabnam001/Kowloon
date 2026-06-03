@@ -22,6 +22,7 @@ export interface Dish {
   veg?: boolean; // can be made vegetarian / is vegetarian
   vegan?: boolean; // can be made vegan
   isNew?: boolean;
+  popular?: boolean; // house favourite / signature dish
   allergens?: string;
   hasImage?: boolean; // whether a real photo exists; otherwise use placeholder
 }
@@ -1110,6 +1111,35 @@ export const dishes: Dish[] = [
     hasImage: true,
   },
 ];
+
+// House favourites — the signature/most-loved dishes, surfaced with a star
+// badge and a dedicated "Favourites" filter. Curated from the journey
+// signatures plus enduring classics. Applied as a flag so the markup and
+// filtering stay declarative.
+const FAVOURITE_IDS = new Set<string>([
+  "1", // luksus forårsrulle
+  "5",
+  "6",
+  "13",
+  "19",
+  "21",
+  "22",
+  "32",
+  "34",
+  "37",
+  "46",
+  "47",
+  "59",
+  "74",
+  "81",
+  "82",
+  "87",
+  "89",
+]);
+
+for (const d of dishes) {
+  if (FAVOURITE_IDS.has(d.id)) d.popular = true;
+}
 
 // ---- Extra add-ons (tilbehør) ----
 export const extras = [

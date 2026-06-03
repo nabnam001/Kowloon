@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useLang } from "./LangProvider";
 import { Reveal } from "./Reveal";
 import { pricing, takeawayBoxes } from "@/data/site";
@@ -144,16 +143,16 @@ function DealCard({
         {icons.map((ic, i) => (
           <div key={ic} className="flex items-center gap-3 sm:gap-5">
             <div className="flex flex-col items-center gap-2">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
-                <Image
-                  src={`/brand/${ic}.svg`}
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="h-9 w-9 object-contain brightness-0 invert"
-                />
+              <div
+                className={`flex h-16 w-16 items-center justify-center rounded-2xl border ${
+                  featured
+                    ? "border-gold/30 bg-gold/10 text-gold-soft"
+                    : "border-cream/15 bg-white/[0.04] text-cream/85"
+                }`}
+              >
+                <CourseIcon kind={ic} />
               </div>
-              <span className="text-xs text-cream/60">{labels[i]}</span>
+              <span className="text-xs text-cream/65">{labels[i]}</span>
             </div>
             {i < icons.length - 1 && (
               <span className="text-2xl font-light text-gold">+</span>
@@ -177,5 +176,41 @@ function Pill({ label, price }: { label: string; price: number }) {
     <span className="rounded-full glass px-4 py-2">
       {label} <span className="font-semibold text-gold">{price},-</span>
     </span>
+  );
+}
+
+/** Clean line icons for each course, in the site's stroke style. */
+function CourseIcon({ kind }: { kind: string }) {
+  const common = {
+    width: 30,
+    height: 30,
+    viewBox: "0 0 24 24",
+    fill: "none" as const,
+    "aria-hidden": true,
+  };
+  if (kind === "forret")
+    // soup bowl with steam (starter)
+    return (
+      <svg {...common}>
+        <path d="M3 11h18a8 8 0 0 1-8 8h-2a8 8 0 0 1-8-8Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+        <path d="M3 11h18" stroke="currentColor" strokeWidth="1.4" />
+        <path d="M9 3c-.8.9-.8 1.8 0 2.7M13 3c-.8.9-.8 1.8 0 2.7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      </svg>
+    );
+  if (kind === "hovedret")
+    // plate with fork & knife (main)
+    return (
+      <svg {...common}>
+        <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.4" />
+        <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="1.2" />
+      </svg>
+    );
+  // dessert: ice cream / sweet
+  return (
+    <svg {...common}>
+      <path d="M8 9a4 4 0 0 1 8 0Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M8 9h8l-3.4 10a.7.7 0 0 1-1.2 0L8 9Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M9.5 13h5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
   );
 }

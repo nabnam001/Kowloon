@@ -2,13 +2,14 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { JourneyKey } from "@/data/cuisineThemes";
+import { useInViewport } from "./useInViewport";
 
 /**
  * Ambient, per-destination particles layered into each journey scene.
  * - China  → floating lantern embers rising warm
  * - Thailand → drifting herb/spice flecks
  * - Vietnam → soft rising steam columns
- * Purely decorative; disabled for reduced-motion.
+ * Purely decorative; disabled for reduced-motion and paused off-screen.
  */
 export function SceneParticles({
   themeKey,
@@ -18,19 +19,24 @@ export function SceneParticles({
   accent: string;
 }) {
   const reduce = useReducedMotion();
+  const { ref, inView } = useInViewport<HTMLDivElement>("0px");
   if (reduce) return null;
 
   return (
-    <div className="pointer-events-none absolute inset-0 -z-[5] overflow-hidden" aria-hidden>
-      {themeKey === "kina" && <Embers accent={accent} />}
-      {themeKey === "thailand" && <Spices accent={accent} />}
-      {themeKey === "vietnam" && <Steam />}
+    <div
+      ref={ref}
+      className="pointer-events-none absolute inset-0 -z-[5] overflow-hidden"
+      aria-hidden
+    >
+      {inView && themeKey === "kina" && <Embers accent={accent} />}
+      {inView && themeKey === "thailand" && <Spices accent={accent} />}
+      {inView && themeKey === "vietnam" && <Steam />}
     </div>
   );
 }
 
 function Embers({ accent }: { accent: string }) {
-  const items = Array.from({ length: 16 });
+  const items = Array.from({ length: 10 });
   return (
     <>
       {items.map((_, i) => {
@@ -68,7 +74,7 @@ function Embers({ accent }: { accent: string }) {
 }
 
 function Spices({ accent }: { accent: string }) {
-  const items = Array.from({ length: 14 });
+  const items = Array.from({ length: 9 });
   return (
     <>
       {items.map((_, i) => {

@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useLang } from "./LangProvider";
 
 export function SpiceMeter({
   level,
@@ -7,12 +10,14 @@ export function SpiceMeter({
   level: number;
   size?: number;
 }) {
+  const { t } = useLang();
   if (!level) return null;
+  const label = `${t.menu.spice} ${level}/3`;
   return (
     <span
       className="inline-flex items-center gap-0.5"
-      aria-label={`Styrke ${level} af 3`}
-      title={`Styrke ${level}/3`}
+      aria-label={label}
+      title={label}
     >
       {Array.from({ length: 3 }).map((_, i) => (
         <Image

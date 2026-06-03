@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { cuisineThemes, type JourneyKey } from "@/data/cuisineThemes";
 import { dishes as allDishes, type Dish } from "@/data/menu";
 import { useLang } from "./LangProvider";
@@ -290,6 +290,7 @@ export function Journey() {
 
 /** Subtle, drifting cultural motifs per destination */
 function Motifs({ themeKey, accent }: { themeKey: JourneyKey; accent: string }) {
+  const reduce = useReducedMotion();
   const glyph =
     themeKey === "kina" ? "灯" : themeKey === "thailand" ? "✿" : "phở";
   const items = [
@@ -305,7 +306,7 @@ function Motifs({ themeKey, accent }: { themeKey: JourneyKey; accent: string }) 
           key={i}
           className="absolute font-display font-bold"
           style={{ left: it.left, top: it.top, fontSize: it.size, color: accent, opacity: 0.06 }}
-          animate={{ y: [0, -24, 0], rotate: [0, 6, 0] }}
+          animate={reduce ? undefined : { y: [0, -24, 0], rotate: [0, 6, 0] }}
           transition={{ duration: it.dur, repeat: Infinity, ease: "easeInOut", delay: i * 1.3 }}
         >
           {glyph}
